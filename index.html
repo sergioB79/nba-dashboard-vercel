@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <title>NBA Quarter & OT Dashboard</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      background: #0b1020;
+      color: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hidden { display: none; }
+
+    /* Ecrã inicial (loading full-screen) */
+    #init-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    #init-screen h1 {
+      margin-bottom: 12px;
+    }
+
+    #init-subtitle {
+      color: #b3b3b3;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+
+    #init-progress {
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    #init-detail {
+      color: #aaaaaa;
+      font-size: 0.85rem;
+      min-height: 1.2em;
+    }
+
+    .progress-bar-container {
+      width: min(420px, 90vw);
+      height: 8px;
+      background: #161b2f;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 12px auto 18px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #42ffb8, #00b4ff);
+      transition: width 0.25s ease-out;
+    }
+
+    #init-error {
+      color: #ff6b6b;
+      margin-top: 8px;
+      font-size: 0.9rem;
+      min-height: 1.2em;
+    }
+
+    #enter-btn {
+      margin-top: 20px;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: none;
+      background: #1f8cff;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.95rem;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    #enter-btn.ready {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #enter-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    /* App principal */
+
+    #app {
+      flex: 1;
+      padding: 16px 20px 24px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .app-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .app-header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    .app-header .sub {
+      font-size: 0.85rem;
+      color: #b3b3b3;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin: 10px 0 12px;
+      border-bottom: 1px solid #222842;
+      padding-bottom: 4px;
+      overflow-x: auto;
+    }
+
+    .tab-button {
+      border: none;
+      background: transparent;
+      color: #c5c7f5;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .tab-button.active {
+      background: #1f2a4d;
+      color: #ffffff;
+    }
+
+    .tab-content {
+      margin-top: 8px;
+    }
+
+    .info {
+      font-size: 0.9rem;
+      color: #bbbbbb;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .toggle-box {
+      padding: 8px 12px;
+      background: #161b2f;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+    }
+
+    .toggle-box label {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .toggle-box input {
+      cursor: pointer;
+    }
+
+    .summary {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: #cccccc;
+    }
+
+    .error {
+      color: #ff6b6b;
+      margin-top: 6px;
+    }
+
+    .tables-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    @media (min-width: 900px) {
+      .tables-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .card-ot {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .card {
+      background: #161b2f;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      margin: 0 0 4px;
+    }
+
+    .card small {
+      color: #aaaaaa;
+      font-size: 0.8rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 4px 6px;
+      text-align: right;
+      border-bottom: 1px solid #252b45;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    th {
+      background: #202542;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:nth-child(even) td {
+      background: #111529;
+    }
+
+    tr.selectable-row {
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    tr.selectable-row:hover td {
+      background: #1c2240;
+    }
+
+    tr.selected-row td {
+      background: #27315e !important;
+    }
+
+    .highlight-team {
+      background: #23335a;
+    }
+
+    .highlight-team td {
+      background: #23335a !important;
+    }
+
+    .chip-group {
+      display: inline-flex;
+      gap: 6px;
+    }
+
+    .chip {
+      border: 1px solid #30406e;
+      background: #161b2f;
+      color: #cdd4ff;
+      padding: 3px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .chip.active {
+      background: #2f80ff;
+      color: white;
+      border-color: #2f80ff;
+    }
+
+    .analysis-meta {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    @media (min-width: 720px) {
+      .analysis-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .analysis-columns {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 720px) {
+      .analysis-columns {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    .analysis-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px;
+      background: #161b2f;
+      border-radius: 10px;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .analysis-col h3 {
+      margin: 0 0 4px 0;
+    }
+
+    .analysis-section {
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px solid #222842;
+    }
+
+    .team-panel {
+      background: transparent;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #27315e;
+      font-size: 0.75rem;
+      margin-left: 4px;
+    }
+
+    .standings-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .heatmap-row {
+      transition: background 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- ECRÃ DE ARRANQUE / LOADING -->
+  <div id="init-screen">
+    <h1>NBA Quarter & OT Dashboard</h1>
+    <div id="init-subtitle">
+      A preparar dados da época 2025-26. A primeira carga pode demorar um pouco.
+    </div>
+
+    <div id="init-progress">Processo 0/7</div>
+    <div class="progress-bar-container">
+      <div id="init-progress-bar" class="progress-bar"></div>
+    </div>
+    <div id="init-detail"></div>
+    <div id="init-error"></div>
+
+    <button id="enter-btn" disabled>Entrar no dashboard</button>
+  </div>
+
+  <!-- APP PRINCIPAL (tabs) -->
+  <div id="app" class="hidden">
+    <div class="app-header">
+      <h1>NBA Quarter & OT Dashboard</h1>
+      <div class="sub">Época 2025-26 • Dados locais + live API</div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-button active" data-tab="games">Lista de Jogos</button>
+      <button class="tab-button" data-tab="standings">Standings gerais</button>
+      <button class="tab-button" data-tab="quarters">Standings por Quarto & OT</button>
+      <button class="tab-button" data-tab="analysis">Análise de Jogo</button>
+    </div>
+
+    <!-- TAB: LISTA DE JOGOS -->
+    <div id="tab-games" class="tab-content">
+      <p class="info">
+        Jogos de hoje em tempo real e próximos jogos (hoje ainda por começar + amanhã),
+        carregados da API oficial da NBA via <code>nba_api</code>.
+      </p>
+
+      <div id="games-error" class="error hidden"></div>
+
+      <div class="tables-container">
+        <div id="games-live" class="card"></div>
+        <div id="games-upcoming" class="card"></div>
+      </div>
+    </div>
+
+    <!-- TAB: STANDINGS QUARTERS/OT -->
+    <div id="tab-quarters" class="tab-content hidden">
+      <div class="info">
+        Standings por período, calculados a partir do CSV local gerado pelo script.
+      </div>
+
+      <div class="controls">
+        <div class="toggle-box">
+          <span><strong>Modo:</strong></span>
+          <label>
+            <input type="radio" name="mode" value="avg" checked />
+            Médias por jogo
+          </label>
+          <label>
+            <input type="radio" name="mode" value="total" />
+            Totais absolutos
+          </label>
+        </div>
+
+        <div class="toggle-box">
+          <span><strong>Jogos:</strong></span>
+          <label>
+            <input type="radio" name="loc" value="all" checked />
+            Todos
+          </label>
+          <label>
+            <input type="radio" name="loc" value="home" />
+            Casa
+          </label>
+          <label>
+            <input type="radio" name="loc" value="away" />
+            Fora
+          </label>
+        </div>
+      </div>
+
+      <div id="error" class="error hidden"></div>
+      <div id="summary" class="summary hidden"></div>
+      <div id="tables" class="tables-container hidden"></div>
+    </div>
+
+    <!-- TAB: ANÁLISE DE JOGO -->
+    <div id="tab-analysis" class="tab-content hidden">
+      <div class="card">
+        <h2>Análise de jogo</h2>
+        <div id="analysis-content" class="info">
+          Escolha um jogo na lista de jogos para ver detalhes e destacar as equipas nos standings.
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: STANDINGS GERAIS -->
+    <div id="tab-standings" class="tab-content hidden">
+      <div class="controls standings-controls">
+        <div class="toggle-box">
+          <span><strong>Conferência:</strong></span>
+          <label><input type="radio" name="standings-conf" value="all" checked /> Todas</label>
+          <label><input type="radio" name="standings-conf" value="East" /> Este</label>
+          <label><input type="radio" name="standings-conf" value="West" /> Oeste</label>
+        </div>
+        <div class="toggle-box">
+          <span><strong>Âmbito:</strong></span>
+          <label><input type="radio" name="standings-loc" value="all" checked /> Total</label>
+          <label><input type="radio" name="standings-loc" value="home" /> Casa</label>
+          <label><input type="radio" name="standings-loc" value="away" /> Fora</label>
+        </div>
+        <div class="toggle-box" style="display:none;">
+          <span><strong>Heatmap:</strong></span>
+          <label><input type="checkbox" id="heatmap-toggle" /> Ativar</label>
+        </div>
+      </div>
+      <div id="standings-error" class="error hidden"></div>
+      <div id="standings-meta" class="summary hidden"></div>
+      <div id="standings-container"></div>
+    </div>
+  </div>
+
+  <footer style="padding:12px 16px; text-align:center; color:#9aa3c7; font-size:0.85rem; background:#0b1020; border-top:1px solid #1c2545;">
+    by <a href="https://sergiob79.github.io/homepage/" target="_blank" rel="noopener noreferrer" style="color:#7fb5ff; text-decoration:none;">Sergio Batalha</a>
+  </footer>
+
+  <script>
+    const CSV_ENDPOINT = "/api/quarters_csv";
+    const ARENAS_BY_TEAM = {
+      "ATL": "State Farm Arena (Atlanta)",
+      "BOS": "TD Garden (Boston)",
+      "BKN": "Barclays Center (Brooklyn)",
+      "CHA": "Spectrum Center (Charlotte)",
+      "CHI": "United Center (Chicago)",
+      "CLE": "Rocket Mortgage FieldHouse (Cleveland)",
+      "DAL": "American Airlines Center (Dallas)",
+      "DEN": "Ball Arena (Denver)",
+      "DET": "Little Caesars Arena (Detroit)",
+      "GSW": "Chase Center (San Francisco)",
+      "HOU": "Toyota Center (Houston)",
+      "IND": "Gainbridge Fieldhouse (Indianapolis)",
+      "LAC": "Intuit Dome (Los Angeles)",
+      "LAL": "Crypto.com Arena (Los Angeles)",
+      "MEM": "FedExForum (Memphis)",
+      "MIA": "Kaseya Center (Miami)",
+      "MIL": "Fiserv Forum (Milwaukee)",
+      "MIN": "Target Center (Minneapolis)",
+      "NOP": "Smoothie King Center (New Orleans)",
+      "NYK": "Madison Square Garden (New York)",
+      "OKC": "Paycom Center (Oklahoma City)",
+      "ORL": "Kia Center (Orlando)",
+      "PHI": "Wells Fargo Center (Philadelphia)",
+      "PHX": "Footprint Center (Phoenix)",
+      "POR": "Moda Center (Portland)",
+      "SAC": "Golden 1 Center (Sacramento)",
+      "SAS": "Frost Bank Center (San Antonio)",
+      "TOR": "Scotiabank Arena (Toronto)",
+      "UTA": "Delta Center (Salt Lake City)",
+      "WAS": "Capital One Arena (Washington)",
+    };
+
+    const initScreen = document.getElementById("init-screen");
+    const app = document.getElementById("app");
+    const initProgress = document.getElementById("init-progress");
+    const initDetail = document.getElementById("init-detail");
+    const initProgressBar = document.getElementById("init-progress-bar");
+    const initError = document.getElementById("init-error");
+    const enterBtn = document.getElementById("enter-btn");
+
+    const errorEl = document.getElementById("error");
+    const summaryEl = document.getElementById("summary");
+    const tablesContainer = document.getElementById("tables");
+    const modeInputs = document.querySelectorAll('input[name="mode"]');
+    const locInputs = document.querySelectorAll('input[name="loc"]');
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabGames = document.getElementById("tab-games");
+    const tabQuarters = document.getElementById("tab-quarters");
+    const tabAnalysis = document.getElementById("tab-analysis");
+    const tabStandings = document.getElementById("tab-standings");
+    const standingsContainer = document.getElementById("standings-container");
+    const standingsErrorEl = document.getElementById("standings-error");
+    const standingsMetaEl = document.getElementById("standings-meta");
+    const standingsConfInputs = document.querySelectorAll('input[name="standings-conf"]');
+    const standingsLocInputs = document.querySelectorAll('input[name="standings-loc"]');
+    const heatmapToggle = document.getElementById("heatmap-toggle");
+    const analysisContainer = document.getElementById("analysis-content");
+
+    const gamesErrorEl = document.getElementById("games-error");
+    const gamesLiveContainer = document.getElementById("games-live");
+    const gamesUpcomingContainer = document.getElementById("games-upcoming");
+
+    let csvRows = null;
+    let standingsData = null;
+    let gamesIndex = null;
+    let gamesData = null;
+    let countdownTimer = null;
+    let selectedGame = null;
+    let teamGamesByTeam = null;
+    let teamFilters = {};
+    let standingsApiData = null;
+    let standingsMaps = null;
+    let teamQuarterScope = {};
+
+    document.addEventListener("DOMContentLoaded", () => {
+      modeInputs.forEach(inp =>
+        inp.addEventListener("change", () => { if (standingsData) renderTables(standingsData); })
+      );
+      locInputs.forEach(inp =>
+        inp.addEventListener("change", () => { if (standingsData) renderTables(standingsData); })
+      );
+
+      tabButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          switchTab(btn.dataset.tab);
+          if (btn.dataset.tab === "games" && gamesData) {
+            renderGamesTab();
+          } else if (btn.dataset.tab === "quarters" && standingsData) {
+            renderTables(standingsData);
+          } else if (btn.dataset.tab === "analysis") {
+            renderAnalysisTab();
+          } else if (btn.dataset.tab === "standings") {
+            renderStandingsTab();
+          }
+        });
+      });
+
+      standingsConfInputs.forEach(inp => inp.addEventListener("change", renderStandingsTab));
+      standingsLocInputs.forEach(inp => inp.addEventListener("change", renderStandingsTab));
+      if (heatmapToggle) heatmapToggle.addEventListener("change", renderStandingsTab);
+
+      enterBtn.addEventListener("click", () => {
+        // remove o ecrã inicial COMPLETAMENTE
+        if (initScreen && initScreen.parentNode) {
+          initScreen.parentNode.removeChild(initScreen);
+        }
+
+        // mostra a app
+        app.classList.remove("hidden");
+
+        // renderiza imediatamente as tabs
+        if (standingsData) {
+          renderTables(standingsData);
+        }
+        if (gamesData) {
+          renderGamesTab();
+        }
+        renderAnalysisTab();
+        renderStandingsTab();
+      });
+
+      runInit();
+    });
+
+    function switchTab(tabName) {
+      tabButtons.forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
+      tabGames.classList.toggle("hidden", tabName !== "games");
+      tabQuarters.classList.toggle("hidden", tabName !== "quarters");
+      tabAnalysis.classList.toggle("hidden", tabName !== "analysis");
+      tabStandings.classList.toggle("hidden", tabName !== "standings");
+    }
+
+    function updateInit(stepIdx, totalSteps, label, detail = "") {
+      initProgress.textContent = `Processo ${stepIdx}/${totalSteps}`;
+      initDetail.textContent = label + (detail ? " — " + detail : "");
+      const pct = Math.max(0, Math.min(100, Math.round((stepIdx - 0.05) / totalSteps * 100)));
+      initProgressBar.style.width = pct + "%";
+    }
+
+    function setInitError(msg) {
+      initError.textContent = msg;
+    }
+
+    function enableEnterButton() {
+      enterBtn.disabled = false;
+      enterBtn.classList.add("ready");
+      enterBtn.textContent = "Entrar no dashboard";
+    }
+
+    async function runInit() {
+      setInitError("");
+      enterBtn.disabled = true;
+      enterBtn.classList.remove("ready");
+      enterBtn.textContent = "A preparar...";
+
+      const steps = [
+        {
+          label: "Atualizar ficheiro local e ler CSV",
+          fn: async () => {
+            const resp = await fetch(CSV_ENDPOINT + "?t=" + Date.now());
+            if (!resp.ok) {
+              let msg = "HTTP " + resp.status;
+              try {
+                const data = await resp.json();
+                if (data.error) msg = data.error;
+              } catch (_) {}
+              throw new Error(msg);
+            }
+            const ct = resp.headers.get("content-type") || "";
+            if (ct.includes("application/json")) {
+              const data = await resp.json();
+              throw new Error(data.error || "Resposta JSON inesperada.");
+            }
+            const csvText = await resp.text();
+            csvRows = parseCSV(csvText);
+          }
+        },
+        {
+          label: "Construir standings por período",
+          fn: async () => {
+            standingsData = buildStandings(csvRows);
+          }
+        },
+        {
+          label: "Indexar lista de jogos (CSV)",
+          fn: async () => {
+            gamesIndex = buildGamesIndex(csvRows);
+            teamGamesByTeam = buildTeamGames(csvRows);
+          }
+        },
+        {
+          label: "Carregar jogos live e próximos",
+          fn: async () => {
+            const resp = await fetch("/api/games?t=" + Date.now());
+            if (!resp.ok) {
+              throw new Error("HTTP " + resp.status);
+            }
+            const data = await resp.json();
+            if (!data.ok) {
+              throw new Error(data.error || "Erro ao carregar /api/games");
+            }
+            gamesData = data;
+          }
+        },
+        {
+          label: "Carregar standings gerais",
+          fn: async () => {
+            const resp = await fetch("/api/standings?t=" + Date.now());
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
+            const data = await resp.json();
+            if (!data.ok) throw new Error(data.error || "Erro ao carregar standings");
+            standingsApiData = Array.isArray(data.rows) ? data.rows : [];
+            refreshStandingsMaps();
+          }
+        },
+        {
+          label: "Preparar informação por equipa",
+          fn: async () => {
+            await new Promise(res => setTimeout(res, 50));
+          }
+        },
+        {
+          label: "Ajustar interface",
+          fn: async () => {
+            await new Promise(res => setTimeout(res, 80));
+          }
+        }
+      ];
+
+      const total = steps.length;
+
+      try {
+        for (let i = 0; i < total; i++) {
+          const step = steps[i];
+          updateInit(i + 1, total, step.label);
+          await step.fn();
+        }
+        updateInit(total, total, "Concluído", "Dados prontos.");
+        enableEnterButton();
+      } catch (err) {
+        console.error(err);
+        setInitError("Falha ao preparar dados: " + err.message);
+        enterBtn.disabled = true;
+        enterBtn.classList.remove("ready");
+        enterBtn.textContent = "Erro";
+      }
+    }
+
+    /* === CSV / STANDINGS LÓGICA === */
+
+    function parseCSV(text) {
+      const lines = text
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
+
+      if (lines.length < 2) {
+        throw new Error("CSV parece estar vazio.");
+      }
+
+      const headers = lines[0].split(",").map(h => h.trim());
+      const rows = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(",");
+        const obj = {};
+        headers.forEach((h, idx) => {
+          obj[h] = (cols[idx] || "").trim();
+        });
+        rows.push(obj);
+      }
+
+      return rows;
+    }
+
+    function toNumber(val) {
+      const n = Number(val);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function detectLocation(matchup, teamCode) {
+      if (!matchup || !teamCode) return "all";
+      const parts = matchup.split(" ").filter(Boolean);
+      if (parts.length !== 3) return "all";
+      const left = parts[0];
+      const sep = parts[1];
+      const right = parts[2];
+
+      if (sep === "@") {
+        if (left === teamCode) return "away";
+        if (right === teamCode) return "home";
+      } else if (sep.toLowerCase().startsWith("vs")) {
+        if (left === teamCode) return "home";
+        if (right === teamCode) return "away";
+      }
+      return "all";
+    }
+
+    function buildStandings(rows) {
+      const games = {};
+      for (const r of rows) {
+        const gid = r["GAME_ID"];
+        if (!gid) continue;
+        if (!games[gid]) games[gid] = [];
+        games[gid].push(r);
+      }
+
+      const teams = {};
+
+      for (const gid in games) {
+        const gameRows = games[gid];
+        if (gameRows.length < 2) continue;
+
+        for (let idx = 0; idx < gameRows.length; idx++) {
+          const r = gameRows[idx];
+          const opp = gameRows[(idx + 1) % gameRows.length];
+
+          const code = r["TEAM_ABBREVIATION"] || r["TEAM_NAME"];
+          if (!code) continue;
+          const teamName = r["TEAM_NAME"] || code;
+
+          if (!teams[code]) {
+            teams[code] = {
+              code,
+              name: teamName,
+              games_total_all: 0,
+              games_total_home: 0,
+              games_total_away: 0,
+              games_ot_all: 0,
+              games_ot_home: 0,
+              games_ot_away: 0,
+              Q1_for_all: 0, Q1_against_all: 0,
+              Q2_for_all: 0, Q2_against_all: 0,
+              Q3_for_all: 0, Q3_against_all: 0,
+              Q4_for_all: 0, Q4_against_all: 0,
+              OT_for_all: 0, OT_against_all: 0,
+              Q1_for_home: 0, Q1_against_home: 0,
+              Q2_for_home: 0, Q2_against_home: 0,
+              Q3_for_home: 0, Q3_against_home: 0,
+              Q4_for_home: 0, Q4_against_home: 0,
+              OT_for_home: 0, OT_against_home: 0,
+              Q1_for_away: 0, Q1_against_away: 0,
+              Q2_for_away: 0, Q2_against_away: 0,
+              Q3_for_away: 0, Q3_against_away: 0,
+              Q4_for_away: 0, Q4_against_away: 0,
+              OT_for_away: 0, OT_against_away: 0,
+            };
+          }
+
+          const t = teams[code];
+          const matchup = r["MATCHUP"] || "";
+          const loc = detectLocation(matchup, code);
+
+          const q1_for = toNumber(r["Q1"]);
+          const q2_for = toNumber(r["Q2"]);
+          const q3_for = toNumber(r["Q3"]);
+          const q4_for = toNumber(r["Q4"]);
+          const ot_for = toNumber(r["OT"]);
+
+          const q1_against = toNumber(opp["Q1"]);
+          const q2_against = toNumber(opp["Q2"]);
+          const q3_against = toNumber(opp["Q3"]);
+          const q4_against = toNumber(opp["Q4"]);
+          const ot_against = toNumber(opp["OT"]);
+
+          t.Q1_for_all += q1_for;
+          t.Q1_against_all += q1_against;
+          t.Q2_for_all += q2_for;
+          t.Q2_against_all += q2_against;
+          t.Q3_for_all += q3_for;
+          t.Q3_against_all += q3_against;
+          t.Q4_for_all += q4_for;
+          t.Q4_against_all += q4_against;
+          t.OT_for_all += ot_for;
+          t.OT_against_all += ot_against;
+          t.games_total_all += 1;
+
+          if (loc === "home") {
+            t.Q1_for_home += q1_for;
+            t.Q1_against_home += q1_against;
+            t.Q2_for_home += q2_for;
+            t.Q2_against_home += q2_against;
+            t.Q3_for_home += q3_for;
+            t.Q3_against_home += q3_against;
+            t.Q4_for_home += q4_for;
+            t.Q4_against_home += q4_against;
+            t.OT_for_home += ot_for;
+            t.OT_against_home += ot_against;
+            t.games_total_home += 1;
+          } else if (loc === "away") {
+            t.Q1_for_away += q1_for;
+            t.Q1_against_away += q1_against;
+            t.Q2_for_away += q2_for;
+            t.Q2_against_away += q2_against;
+            t.Q3_for_away += q3_for;
+            t.Q3_against_away += q3_against;
+            t.Q4_for_away += q4_for;
+            t.Q4_against_away += q4_against;
+            t.OT_for_away += ot_for;
+            t.OT_against_away += ot_against;
+            t.games_total_away += 1;
+          }
+
+          const ot_flag_self = toNumber(r["OT_FLAG"]);
+          const ot_flag_opp = toNumber(opp["OT_FLAG"]);
+          const ot_periods_self = toNumber(r["OT_PERIODS"]);
+          const ot_periods_opp = toNumber(opp["OT_PERIODS"]);
+
+          const ot_played =
+            (ot_for + ot_against) > 0 ||
+            ot_flag_self > 0 ||
+            ot_flag_opp > 0 ||
+            ot_periods_self > 0 ||
+            ot_periods_opp > 0;
+
+          if (ot_played) {
+            t.games_ot_all += 1;
+            if (loc === "home") t.games_ot_home += 1;
+            else if (loc === "away") t.games_ot_away += 1;
+          }
+        }
+      }
+
+      const teamArray = Object.values(teams);
+      const totalGamesAll = teamArray.reduce((sum, t) => sum + t.games_total_all, 0);
+
+      return { teams: teamArray, totalTeams: teamArray.length, totalGamesAll };
+    }
+
+    function buildGamesIndex(rows) {
+      const games = {};
+      for (const r of rows) {
+        const gid = r["GAME_ID"];
+        if (!gid) continue;
+        if (!games[gid]) {
+          games[gid] = {
+            GAME_ID: gid,
+            GAME_DATE: r["GAME_DATE"] || "",
+            MATCHUP: r["MATCHUP"] || ""
+          };
+        }
+      }
+      return Object.values(games);
+    }
+
+    function buildTeamGames(rows) {
+      const games = {};
+      for (const r of rows) {
+        const gid = r["GAME_ID"];
+        if (!gid) continue;
+        if (!games[gid]) games[gid] = [];
+        games[gid].push(r);
+      }
+
+      const byTeam = {};
+
+      for (const gid in games) {
+        const gameRows = games[gid];
+        if (gameRows.length < 2) continue;
+
+        for (let idx = 0; idx < gameRows.length; idx++) {
+          const r = gameRows[idx];
+          const opp = gameRows[(idx + 1) % gameRows.length];
+
+          const code = (r["TEAM_ABBREVIATION"] || r["TEAM_NAME"] || "").toUpperCase();
+          const oppCode = (opp["TEAM_ABBREVIATION"] || opp["TEAM_NAME"] || "").toUpperCase();
+          if (!code) continue;
+
+          const matchup = r["MATCHUP"] || "";
+          const loc = detectLocation(matchup, code);
+          const dateStr = r["GAME_DATE"] || "";
+          const ptsFor = toNumber(r["PTS"]);
+          const ptsAgainst = toNumber(opp["PTS"]);
+          const result = ptsFor > ptsAgainst ? "W" : ptsFor < ptsAgainst ? "L" : "T";
+
+          if (!byTeam[code]) byTeam[code] = [];
+          byTeam[code].push({
+            gameId: gid,
+            date: dateStr,
+            dateObj: new Date(dateStr),
+            opponent: oppCode,
+            location: loc === "home" ? "home" : loc === "away" ? "away" : "all",
+            ptsFor,
+            ptsAgainst,
+            result,
+          });
+        }
+      }
+
+      Object.keys(byTeam).forEach(code => {
+        byTeam[code].sort((a, b) => (b.dateObj || 0) - (a.dateObj || 0));
+      });
+
+      return byTeam;
+    }
+
+    function makeRanking(teams, key, mode, loc, useOtGames) {
+      const scope = loc === "home" ? "home" : loc === "away" ? "away" : "all";
+      const selectedCodes = getSelectedTeamCodes();
+
+      return [...teams]
+        .map(t => {
+          const for_total = t[`${key}_for_${scope}`] || 0;
+          const against_total = t[`${key}_against_${scope}`] || 0;
+          const diff_total = for_total - against_total;
+
+          const games =
+            useOtGames
+              ? (scope === "home"
+                  ? t.games_ot_home
+                  : scope === "away"
+                    ? t.games_ot_away
+                    : t.games_ot_all)
+              : (scope === "home"
+                  ? t.games_total_home
+                  : scope === "away"
+                    ? t.games_total_away
+                    : t.games_total_all);
+
+          const denom = games > 0 ? games : 1;
+
+          let for_val, against_val, diff_val;
+          if (mode === "avg") {
+            for_val = for_total / denom;
+            against_val = against_total / denom;
+            diff_val = diff_total / denom;
+          } else {
+            for_val = for_total;
+            against_val = against_total;
+            diff_val = diff_total;
+          }
+
+          return {
+            code: t.code,
+            name: t.name,
+            games: games,
+            for_val,
+            against_val,
+            diff_val,
+            isSelected: selectedCodes.has(String(t.code).toUpperCase()),
+          };
+        })
+        .sort((a, b) => b.diff_val - a.diff_val);
+    }
+
+    function renderTables(result) {
+      const { teams, totalTeams, totalGamesAll } = result;
+      if (!teams || teams.length === 0) {
+        throw new Error("Não foram encontradas equipas no CSV.");
+      }
+
+      const mode = document.querySelector('input[name="mode"]:checked')?.value || "avg";
+      const loc = document.querySelector('input[name="loc"]:checked')?.value || "all";
+      const isAvg = (mode === "avg");
+
+      const locLabel =
+        loc === "home" ? "Jogos em casa" :
+        loc === "away" ? "Jogos fora" :
+        "Todos os jogos";
+
+      summaryEl.innerHTML = `
+        <strong>Resumo:</strong>
+        ${totalTeams} equipas, ${totalGamesAll} registos (equipa-jogo).<br>
+        <span class="info">
+          Tabelas ordenadas pela <em>diferença de pontos</em> em cada período.<br>
+          Modo atual: <strong>${isAvg ? "Médias por jogo" : "Totais absolutos"}</strong>,
+          Filtro de jogos: <strong>${locLabel}</strong>.
+        </span>
+      `;
+      summaryEl.classList.remove("hidden");
+
+      const periods = [
+        { key: "Q1", label: "1st Quarter", useOtGames: false },
+        { key: "Q2", label: "2nd Quarter", useOtGames: false },
+        { key: "Q3", label: "3rd Quarter", useOtGames: false },
+        { key: "Q4", label: "4th Quarter", useOtGames: false },
+        { key: "OT", label: "Overtime", useOtGames: true },
+      ];
+
+      tablesContainer.innerHTML = "";
+
+      periods.forEach(period => {
+        const ranking = makeRanking(teams, period.key, mode, loc, period.useOtGames);
+        const card = document.createElement("div");
+        card.className = "card" + (period.key === "OT" ? " card-ot" : "");
+
+        const gamesLabel = period.key === "OT"
+          ? "G = jogos com OT (conforme filtro Todos/Casa/Fora)"
+          : "G = jogos (conforme filtro Todos/Casa/Fora)";
+
+        card.innerHTML = `
+          <h2>${period.label} <span class="badge">${period.key}</span></h2>
+          <small>${gamesLabel}</small>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Team</th>
+                <th>G</th>
+                <th>For</th>
+                <th>Against</th>
+                <th>Diff</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${ranking
+                .map((t, idx) => `
+                  <tr${t.isSelected ? ' class="highlight-team"' : ''}>
+                    <td>${idx + 1}</td>
+                    <td>${escapeHtml(t.code)} - ${escapeHtml(t.name)}</td>
+                    <td>${t.games}</td>
+                    <td>${formatNumber(t.for_val, isAvg)}</td>
+                    <td>${formatNumber(t.against_val, isAvg)}</td>
+                    <td>${formatNumber(t.diff_val, isAvg)}</td>
+                  </tr>
+                `)
+                .join("")}
+            </tbody>
+          </table>
+        `;
+
+        tablesContainer.appendChild(card);
+      });
+
+      tablesContainer.classList.remove("hidden");
+    }
+
+    function formatNumber(val, isAvg) {
+      if (!Number.isFinite(val)) return "-";
+      return isAvg ? val.toFixed(2) : Math.round(val);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getGameKey(g) {
+      if (!g || typeof g !== "object") return "";
+      const gid = g.game_id || g.GAME_ID || "";
+      const startIso = g.start_time_utc || "";
+      const home = g.home?.tricode || g.homeTeam?.teamTricode || "";
+      const away = g.away?.tricode || g.awayTeam?.teamTricode || "";
+      return [gid, home, away, startIso].filter(Boolean).join("|");
+    }
+
+    function getSelectedTeamCodes() {
+      if (!selectedGame) return new Set();
+      const codes = [];
+      const home = selectedGame.home || {};
+      const away = selectedGame.away || {};
+      if (home.tricode) codes.push(String(home.tricode).toUpperCase());
+      if (away.tricode) codes.push(String(away.tricode).toUpperCase());
+      return new Set(codes);
+    }
+
+    function getSelectedTeamIds() {
+      if (!selectedGame) return new Set();
+      const ids = [];
+      const home = selectedGame.home || {};
+      const away = selectedGame.away || {};
+      if (home.id) ids.push(Number(home.id));
+      if (away.id) ids.push(Number(away.id));
+      return new Set(ids);
+    }
+
+    function formatLocalDate(isoString, fallback = "") {
+      if (isoString) {
+        const d = new Date(isoString);
+        if (!Number.isNaN(d.getTime())) {
+          return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+        }
+      }
+      return fallback || "—";
+    }
+
+    function formatLocalTime(isoString, fallback = "") {
+      if (isoString) {
+        const d = new Date(isoString);
+        if (!Number.isNaN(d.getTime())) {
+          return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+        }
+      }
+      return fallback || "—";
+    }
+
+    function formatCountdown(isoString) {
+      if (!isoString) return "Hora por confirmar";
+      const start = new Date(isoString);
+      if (Number.isNaN(start.getTime())) return "Hora por confirmar";
+
+      const diffMs = start.getTime() - Date.now();
+      if (diffMs <= 0) return "A iniciar";
+
+      const totalMinutes = Math.floor(diffMs / 60000);
+      const days = Math.floor(totalMinutes / 1440);
+      const hours = Math.floor((totalMinutes % 1440) / 60);
+      const mins = totalMinutes % 60;
+
+      if (days > 0) return `Começa em ${days}d ${hours}h ${mins}m`;
+      if (hours > 0) return `Começa em ${hours}h ${mins}m`;
+      return `Começa em ${mins}m`;
+    }
+
+    function updateCountdownCells() {
+      const cells = gamesUpcomingContainer.querySelectorAll("[data-start-utc]");
+      if (!cells.length) return;
+
+      cells.forEach(cell => {
+        const iso = cell.getAttribute("data-start-utc") || "";
+        cell.textContent = formatCountdown(iso);
+      });
+    }
+
+    function startCountdownTicker() {
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+      }
+      updateCountdownCells();
+      countdownTimer = setInterval(updateCountdownCells, 30000);
+    }
+
+    function streakHeatmapStyle(_streak) {
+      return "";
+    }
+
+    async function ensureOddsLoaded() {
+    }
+
+    function highlightSelectedGameRow() {
+      const key = selectedGame ? getGameKey(selectedGame) : null;
+      const rows = gamesUpcomingContainer.querySelectorAll("tbody tr");
+      rows.forEach(row => {
+        const rowKey = row.getAttribute("data-game-key");
+        row.classList.toggle("selected-row", !!key && rowKey === key);
+      });
+    }
+
+    function getTeamGamesList(teamCode) {
+      if (!teamCode) return [];
+      const code = String(teamCode).toUpperCase();
+      return (teamGamesByTeam && teamGamesByTeam[code]) ? teamGamesByTeam[code] : [];
+    }
+
+    function getTeamFromStandings(code) {
+      if (!standingsData || !standingsData.teams) return null;
+      const up = String(code || "").toUpperCase();
+      return standingsData.teams.find(t => String(t.code || "").toUpperCase() === up) || null;
+    }
+
+    function getLastGames(teamCode, filter = "all", limit = 5) {
+      const games = getTeamGamesList(teamCode);
+      const filtered = games.filter(g => {
+        if (filter === "home") return g.location === "home";
+        if (filter === "away") return g.location === "away";
+        return true;
+      });
+      return filtered.slice(0, limit);
+    }
+
+    function calcAverages(games) {
+      if (!games.length) return { forAvg: 0, againstAvg: 0 };
+      const totals = games.reduce((acc, g) => {
+        acc.for += g.ptsFor;
+        acc.against += g.ptsAgainst;
+        return acc;
+      }, { for: 0, against: 0 });
+      return {
+        forAvg: totals.for / games.length,
+        againstAvg: totals.against / games.length,
+      };
+    }
+
+    /* === PREDIÇÕES (standalone, sem odds) === */
+
+    const PREDICT_K = 10;   // smoothing para shrink
+    const PREDICT_W1 = 0.4; // peso ataque próprio
+    const PREDICT_W2 = 0.4; // peso defesa adversário
+    const PREDICT_W3 = 0.2; // peso média liga
+
+    const erf =
+      Math.erf ||
+      function erf(x) {
+        // aproximação numérica (Abramowitz-Stegun 7.1.26)
+        const sign = x >= 0 ? 1 : -1;
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const p = 0.3275911;
+        const t = 1 / (1 + p * Math.abs(x));
+        const y =
+          1 -
+          (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) *
+          t *
+          Math.exp(-x * x);
+        return sign * y;
+      };
+
+    function normalCdf(z) {
+      // aproximação rápida da CDF normal
+      return 0.5 * (1 + erf(z / Math.SQRT2));
+    }
+
+    function probOver(mean, sd, line) {
+      if (!Number.isFinite(mean) || !Number.isFinite(sd) || sd <= 0) return null;
+      const z = (line + 0.5 - mean) / sd; // continuidade
+      return 1 - normalCdf(z);
+    }
+
+    function computeLeagueBaselines() {
+      const result = {
+        off_home: 0, off_away: 0,
+        def_home: 0, def_away: 0,
+        pace_home: 0, pace_away: 0,
+        q_home: { Q1: 0, Q2: 0, Q3: 0, Q4: 0 },
+        q_away: { Q1: 0, Q2: 0, Q3: 0, Q4: 0 },
+      };
+
+      if (!standingsData || !standingsData.teams?.length) return result;
+      const teams = standingsData.teams;
+
+      let gamesHome = 0, gamesAway = 0;
+      let ptsForHome = 0, ptsForAway = 0;
+      let ptsAgainstHome = 0, ptsAgainstAway = 0;
+      let paceHome = 0, paceAway = 0;
+      const quarters = ["Q1","Q2","Q3","Q4"];
+      const qSumHome = { Q1:0,Q2:0,Q3:0,Q4:0 };
+      const qSumAway = { Q1:0,Q2:0,Q3:0,Q4:0 };
+
+      teams.forEach(t => {
+        const gh = t.games_total_home || 0;
+        const ga = t.games_total_away || 0;
+        gamesHome += gh;
+        gamesAway += ga;
+        const forH = (t.Q1_for_home || 0) + (t.Q2_for_home || 0) + (t.Q3_for_home || 0) + (t.Q4_for_home || 0);
+        const againstH = (t.Q1_against_home || 0) + (t.Q2_against_home || 0) + (t.Q3_against_home || 0) + (t.Q4_against_home || 0);
+        const forA = (t.Q1_for_away || 0) + (t.Q2_for_away || 0) + (t.Q3_for_away || 0) + (t.Q4_for_away || 0);
+        const againstA = (t.Q1_against_away || 0) + (t.Q2_against_away || 0) + (t.Q3_against_away || 0) + (t.Q4_against_away || 0);
+        ptsForHome += forH;
+        ptsAgainstHome += againstH;
+        ptsForAway += forA;
+        ptsAgainstAway += againstA;
+        paceHome += forH + againstH;
+        paceAway += forA + againstA;
+
+        quarters.forEach(q => {
+          qSumHome[q] += t[`${q}_for_home`] || 0;
+          qSumAway[q] += t[`${q}_for_away`] || 0;
+        });
+      });
+
+      result.off_home = gamesHome ? ptsForHome / gamesHome : 0;
+      result.off_away = gamesAway ? ptsForAway / gamesAway : 0;
+      result.def_home = gamesHome ? ptsAgainstHome / gamesHome : 0;
+      result.def_away = gamesAway ? ptsAgainstAway / gamesAway : 0;
+      result.pace_home = gamesHome ? paceHome / gamesHome : 0;
+      result.pace_away = gamesAway ? paceAway / gamesAway : 0;
+
+      quarters.forEach(q => {
+        result.q_home[q] = gamesHome ? qSumHome[q] / gamesHome : 0;
+        result.q_away[q] = gamesAway ? qSumAway[q] / gamesAway : 0;
+      });
+
+      return result;
+    }
+
+    function computeTeamStrengths(teamCode, league) {
+      const games = getTeamGamesList(teamCode);
+      if (!games.length) return null;
+      const code = String(teamCode).toUpperCase();
+
+      const splits = { home: [], away: [] };
+      games.forEach(g => {
+        if (g.location === "home") splits.home.push(g);
+        else if (g.location === "away") splits.away.push(g);
+      });
+
+      const makeSplit = (arr, leagueOff, leagueDef, leaguePace) => {
+        const n = arr.length;
+        const k = PREDICT_K;
+        if (!n) {
+          return { off: leagueOff, def: leagueDef, pace: leaguePace, games: 0, sd_for: 0, sd_against: 0 };
+        }
+        const sumFor = arr.reduce((s, g) => s + g.ptsFor, 0);
+        const sumAgainst = arr.reduce((s, g) => s + g.ptsAgainst, 0);
+        const sumPace = arr.reduce((s, g) => s + g.ptsFor + g.ptsAgainst, 0);
+        const rawOff = sumFor / n;
+        const rawDef = sumAgainst / n;
+        const rawPace = sumPace / n;
+        const off = (k * leagueOff + n * rawOff) / (k + n);
+        const def = (k * leagueDef + n * rawDef) / (k + n);
+        const pace = (k * leaguePace + n * rawPace) / (k + n);
+
+        const meanFor = rawOff;
+        const meanAgainst = rawDef;
+        const varFor = arr.reduce((s, g) => s + Math.pow(g.ptsFor - meanFor, 2), 0) / (n || 1);
+        const varAgainst = arr.reduce((s, g) => s + Math.pow(g.ptsAgainst - meanAgainst, 2), 0) / (n || 1);
+
+        return { off, def, pace, games: n, sd_for: Math.sqrt(varFor), sd_against: Math.sqrt(varAgainst) };
+      };
+
+      return {
+        code,
+        home: makeSplit(splits.home, league.off_home, league.def_home, league.pace_home),
+        away: makeSplit(splits.away, league.off_away, league.def_away, league.pace_away),
+      };
+    }
+
+    function findStandingTeam(code) {
+      if (!standingsData || !standingsData.teams) return null;
+      const up = String(code || "").toUpperCase();
+      return standingsData.teams.find(t => String(t.code || "").toUpperCase() === up) || null;
+    }
+
+    function computeQuarterProfile(teamCode, scope) {
+      const team = findStandingTeam(teamCode);
+      if (!team) return null;
+      const key = scope === "home" ? "home" : "away";
+      const games = key === "home" ? (team.games_total_home || 0) : (team.games_total_away || 0);
+      const denom = games > 0 ? games : 1;
+      const quarters = ["Q1","Q2","Q3","Q4"];
+      const forAvg = {};
+      const againstAvg = {};
+      quarters.forEach(q => {
+        forAvg[q] = (team[`${q}_for_${key}`] || 0) / denom;
+        againstAvg[q] = (team[`${q}_against_${key}`] || 0) / denom;
+      });
+      return { games, forAvg, againstAvg };
+    }
+
+    function normalizeQuartersToTotal(qTotals, targetTotal) {
+      const sumQuarters = Object.values(qTotals).reduce((s, v) => s + (v || 0), 0);
+      if (!sumQuarters || !Number.isFinite(targetTotal)) return qTotals;
+      const diff = targetTotal - sumQuarters;
+      const adjPerQ = diff / 4;
+      const res = { ...qTotals };
+      Object.keys(res).forEach(k => { res[k] = res[k] + adjPerQ; });
+      return res;
+    }
+
+    function buildPredictions(homeCode, awayCode) {
+      const league = computeLeagueBaselines();
+      const homeStr = computeTeamStrengths(homeCode, league);
+      const awayStr = computeTeamStrengths(awayCode, league);
+      if (!homeStr || !awayStr) return null;
+
+      const ePtsHome = PREDICT_W1 * homeStr.home.off + PREDICT_W2 * awayStr.away.def + PREDICT_W3 * league.off_home;
+      const ePtsAway = PREDICT_W1 * awayStr.away.off + PREDICT_W2 * homeStr.home.def + PREDICT_W3 * league.off_away;
+      const eTot = ePtsHome + ePtsAway;
+
+      const qProfileHome = computeQuarterProfile(homeCode, "home");
+      const qProfileAway = computeQuarterProfile(awayCode, "away");
+      const quarters = ["Q1","Q2","Q3","Q4"];
+      const qTotals = {};
+      quarters.forEach(q => {
+        const league_q_home = league.q_home[q] || 0;
+        const league_q_away = league.q_away[q] || 0;
+        const homeFor = qProfileHome ? (qProfileHome.forAvg[q] || 0) : league_q_home;
+        const homeDef = qProfileHome ? (qProfileHome.againstAvg[q] || 0) : league_q_home;
+        const awayFor = qProfileAway ? (qProfileAway.forAvg[q] || 0) : league_q_away;
+        const awayDef = qProfileAway ? (qProfileAway.againstAvg[q] || 0) : league_q_away;
+
+        const eHomeQ = PREDICT_W1 * homeFor + PREDICT_W2 * awayDef + PREDICT_W3 * league_q_home;
+        const eAwayQ = PREDICT_W1 * awayFor + PREDICT_W2 * homeDef + PREDICT_W3 * league_q_away;
+        qTotals[q] = { home: eHomeQ, away: eAwayQ, total: eHomeQ + eAwayQ };
+      });
+
+      const normalizedTotals = normalizeQuartersToTotal(
+        Object.fromEntries(quarters.map(q => [q, qTotals[q].total])),
+        eTot
+      );
+      quarters.forEach(q => {
+        const adj = normalizedTotals[q] - qTotals[q].total;
+        qTotals[q].home += adj / 2;
+        qTotals[q].away += adj / 2;
+        qTotals[q].total = normalizedTotals[q];
+      });
+
+      const sdHome = homeStr.home.sd_for || 0;
+      const sdAway = awayStr.away.sd_for || 0;
+      const varTot = Math.pow(sdHome, 2) + Math.pow(sdAway, 2);
+      const sdTot = Math.sqrt(varTot);
+
+      // distribuição aproximada por quarto (proporcional ao peso do quarto no total)
+      const qSd = {};
+      quarters.forEach(q => {
+        const weight = eTot > 0 ? (qTotals[q].total / eTot) : 0;
+        qSd[q] = weight > 0 ? sdTot * weight : 0;
+      });
+
+      return {
+        league,
+        homeStr,
+        awayStr,
+        ePtsHome,
+        ePtsAway,
+        eTot,
+        sdTot,
+        quarters: qTotals,
+        qSd,
+      };
+    }
+
+    function summarizeRecentGames(teamCode, days = 5) {
+      const games = getTeamGamesList(teamCode);
+      if (!games.length) return "Sem jogos recentes.";
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      const recent = games.filter(g => g.dateObj && g.dateObj >= cutoff);
+      if (!recent.length) return `Sem jogos nos últimos ${days} dias.`;
+
+      const wins = recent.filter(g => g.result === "W").length;
+      const losses = recent.filter(g => g.result === "L").length;
+      const ties = recent.length - wins - losses;
+      const homeCount = recent.filter(g => g.location === "home").length;
+      const awayCount = recent.filter(g => g.location === "away").length;
+
+      const record = `${wins}-${losses}${ties ? "-" + ties : ""}`;
+      return `${recent.length} jogos (${record}) nos últimos ${days} dias · Casa: ${homeCount} · Fora: ${awayCount}`;
+    }
+
+    function buildQuarterRows(teamCode, scope = "all") {
+      const t = getTeamFromStandings(teamCode);
+      if (!t) return null;
+      const scopeKey = scope === "home" ? "home" : scope === "away" ? "away" : "all";
+      const games = scopeKey === "home" ? t.games_total_home : scopeKey === "away" ? t.games_total_away : t.games_total_all;
+      const otGames = scopeKey === "home" ? t.games_ot_home : scopeKey === "away" ? t.games_ot_away : t.games_ot_all;
+      const denom = games > 0 ? games : 1;
+      const keys = [
+        { k: "Q1", label: "Q1" },
+        { k: "Q2", label: "Q2" },
+        { k: "Q3", label: "Q3" },
+        { k: "Q4", label: "Q4" },
+        { k: "OT", label: "OT" },
+      ];
+      return keys.map(item => {
+        const forTotal = t[`${item.k}_for_${scopeKey}`] || 0;
+        const againstTotal = t[`${item.k}_against_${scopeKey}`] || 0;
+        const denomPeriod = item.k === "OT"
+          ? (otGames > 0 ? otGames : 1)
+          : denom;
+        return {
+          label: item.label,
+          forTotal,
+          againstTotal,
+          forAvg: forTotal / denomPeriod,
+          againstAvg: againstTotal / denomPeriod,
+        };
+      });
+    }
+
+    /* === STANDINGS GERAIS === */
+
+    function refreshStandingsMaps() {
+      const source = Array.isArray(standingsApiData)
+        ? standingsApiData.filter(r => r && typeof r === "object")
+        : [];
+      if (!source.length) {
+        standingsMaps = null;
+        return;
+      }
+
+      // ensure pct fallback
+      const rows = source.map(r => {
+        const wins = Number(r.wins || 0);
+        const losses = Number(r.losses || 0);
+        const games = wins + losses;
+        const pct = Number.isFinite(r.win_pct) ? r.win_pct : (games > 0 ? wins / games : 0);
+        const homeW = Number(r.home_w || 0);
+        const homeL = Number(r.home_l || 0);
+        const homeGames = homeW + homeL;
+        const homePct = homeGames > 0 ? homeW / homeGames : 0;
+        const awayW = Number(r.road_w || 0);
+        const awayL = Number(r.road_l || 0);
+        const awayGames = awayW + awayL;
+        const awayPct = awayGames > 0 ? awayW / awayGames : 0;
+        return { ...r, pct_calc: pct };
+      });
+
+      // league rank fallback
+      const leagueSorted = [...rows].sort((a, b) => b.pct_calc - a.pct_calc || b.wins - a.wins);
+      leagueSorted.forEach((r, idx) => {
+        r.league_rank_calc = idx + 1;
+        if (!r.league_rank) r.league_rank = r.league_rank_calc;
+      });
+
+      // league ranks home-only / away-only
+      const leagueHome = [...rows].sort((a, b) => (b.home_pct || 0) - (a.home_pct || 0) || (b.home_w || 0) - (a.home_w || 0));
+      leagueHome.forEach((r, idx) => {
+        r.league_rank_home_calc = idx + 1;
+        if (!r.league_rank_home) r.league_rank_home = r.league_rank_home_calc;
+      });
+      const leagueAway = [...rows].sort((a, b) => (b.away_pct || 0) - (a.away_pct || 0) || (b.road_w || 0) - (a.road_w || 0));
+      leagueAway.forEach((r, idx) => {
+        r.league_rank_away_calc = idx + 1;
+        if (!r.league_rank_away) r.league_rank_away = r.league_rank_away_calc;
+      });
+
+      // conference rank fallback
+      ["East", "West"].forEach(conf => {
+        const confRows = leagueSorted.filter(r => (r.conf || "").toLowerCase() === conf.toLowerCase());
+        confRows.sort((a, b) => b.pct_calc - a.pct_calc || b.wins - a.wins);
+        confRows.forEach((r, idx) => {
+          r.conf_rank_calc = idx + 1;
+          if (!r.conf_rank) r.conf_rank = r.conf_rank_calc;
+        });
+
+        const confHome = rows.filter(r => (r.conf || "").toLowerCase() === conf.toLowerCase());
+        confHome.sort((a, b) => (b.home_pct || 0) - (a.home_pct || 0) || (b.home_w || 0) - (a.home_w || 0));
+        confHome.forEach((r, idx) => {
+          r.conf_rank_home_calc = idx + 1;
+          if (!r.conf_rank_home) r.conf_rank_home = r.conf_rank_home_calc;
+        });
+
+        const confAway = rows.filter(r => (r.conf || "").toLowerCase() === conf.toLowerCase());
+        confAway.sort((a, b) => (b.away_pct || 0) - (a.away_pct || 0) || (b.road_w || 0) - (a.road_w || 0));
+        confAway.forEach((r, idx) => {
+          r.conf_rank_away_calc = idx + 1;
+          if (!r.conf_rank_away) r.conf_rank_away = r.conf_rank_away_calc;
+        });
+      });
+
+      const byId = {};
+      const byCode = {};
+      const bySlug = {};
+      const byName = {};
+      leagueSorted.forEach(r => {
+        if (r.team_id) byId[Number(r.team_id)] = r;
+        if (r.tricode) byCode[String(r.tricode).toUpperCase()] = r;
+        if (r.slug) bySlug[String(r.slug).toUpperCase()] = r;
+        if (r.team) byName[String(r.team).toUpperCase()] = r;
+      });
+
+      standingsMaps = { byId, byCode, bySlug, byName };
+    }
+
+    function renderStandingsTab() {
+      if (!standingsContainer || !standingsErrorEl || !standingsMetaEl) return;
+
+      // ensure maps in sync
+      if (!standingsMaps && standingsApiData && standingsApiData.length) {
+        refreshStandingsMaps();
+      }
+
+      standingsErrorEl.classList.add("hidden");
+      standingsErrorEl.textContent = "";
+
+      const dataRows = Array.isArray(standingsApiData) ? standingsApiData : [];
+      if (!dataRows.length) {
+        standingsContainer.innerHTML = "";
+        standingsMetaEl.classList.add("hidden");
+        standingsErrorEl.textContent = "Standings não disponíveis. Verifique ligação ou API.";
+        standingsErrorEl.classList.remove("hidden");
+        return;
+      }
+
+      const conf = document.querySelector('input[name="standings-conf"]:checked')?.value || "all";
+      const loc = document.querySelector('input[name="standings-loc"]:checked')?.value || "all";
+      const selectedCodes = getSelectedTeamCodes();
+      const selectedIds = getSelectedTeamIds();
+      const useHeatmap = false; // heatmap desativado
+
+      const filtered = dataRows.filter(r => {
+        if (!r || typeof r !== "object") return false;
+        return conf === "all" || (r.conf || "").toLowerCase() === conf.toLowerCase();
+      });
+
+      const rows = filtered
+        .map(r => {
+          if (!r || typeof r !== "object") return null;
+          const wins = Number(loc === "home" ? r.home_w : loc === "away" ? r.road_w : r.wins) || 0;
+          const losses = Number(loc === "home" ? r.home_l : loc === "away" ? r.road_l : r.losses) || 0;
+          const games = wins + losses;
+          const pct = loc === "all"
+            ? (Number.isFinite(r.win_pct) ? r.win_pct : (games > 0 ? wins / games : 0))
+            : (games > 0 ? wins / games : 0);
+          const streak =
+            loc === "home" ? Number(r.streak_home || 0) :
+            loc === "away" ? Number(r.streak_away || 0) :
+            Number(r.streak || 0);
+          return {
+            ...r,
+            wins,
+            losses,
+            pct,
+            streak,
+            isSelected:
+              selectedCodes.has(String(r.tricode || "").toUpperCase()) ||
+              (selectedIds.size && selectedIds.has(Number(r.team_id))),
+            league_rank: r.league_rank || r.league_rank_calc || r.LeagueRank || r.leagueRank || r.leaguerank,
+            conf_rank: r.conf_rank || r.conf_rank_calc || r.ConferenceRank || r.conferenceRank || r.confrank,
+            diff: wins - losses,
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.pct - a.pct || b.wins - a.wins);
+
+      const scopeLabel =
+        loc === "home" ? "Só jogos em casa" :
+        loc === "away" ? "Só jogos fora" : "Todos os jogos";
+      const confLabel =
+        conf === "East" ? "Conferência Este" :
+        conf === "West" ? "Conferência Oeste" : "Toda a liga";
+
+      standingsMetaEl.innerHTML = `
+        <strong>${confLabel}</strong> · ${scopeLabel} · ${rows.length} equipas
+      `;
+      standingsMetaEl.classList.remove("hidden");
+
+      standingsContainer.innerHTML = `
+        <div class="card">
+          <h2>Standings gerais</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Equipa</th>
+                <th>W</th>
+                <th>L</th>
+                <th>PCT</th>
+                <th>Streak</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((r, idx) => {
+                const streak = Number(r.streak || 0);
+                const streakLabel = streak > 0 ? `W${streak}` : streak < 0 ? `L${Math.abs(streak)}` : "—";
+                const rowStyle = useHeatmap ? streakHeatmapStyle(streak) : "";
+                const selectedClass = r.isSelected ? "highlight-team" : "";
+                return `
+                <tr class="${selectedClass}" ${rowStyle}>
+                  <td>${idx + 1}</td>
+                  <td style="text-align:left;">${escapeHtml((r.tricode || "").toUpperCase())} — ${escapeHtml(r.team || "")}</td>
+                  <td>${r.wins}</td>
+                  <td>${r.losses}</td>
+                  <td>${(r.pct * 100).toFixed(1)}%</td>
+                  <td>${streakLabel}</td>
+                </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    /* === LISTA DE JOGOS (LIVE + PRÓXIMOS) === */
+
+    function renderGamesTab() {
+      gamesErrorEl.classList.add("hidden");
+      gamesErrorEl.textContent = "";
+
+      if (!gamesData || !gamesData.ok) {
+        gamesLiveContainer.innerHTML = `
+          <h2>Jogos a decorrer</h2>
+          <small>Não foi possível carregar dados de jogos.</small>
+        `;
+        gamesUpcomingContainer.innerHTML = `
+          <h2>Próximos jogos (hoje + amanhã)</h2>
+          <small>Sem dados.</small>
+        `;
+        return;
+      }
+
+      const live = gamesData.live_games || [];
+      const todayUpcoming = gamesData.today_upcoming || [];
+      const tomorrowUpcoming = gamesData.tomorrow_upcoming || [];
+
+      // --- Jogos LIVE ---
+      if (live.length === 0) {
+        gamesLiveContainer.innerHTML = `
+          <h2>Jogos a decorrer</h2>
+          <small>Não há jogos a decorrer neste momento.</small>
+        `;
+      } else {
+        gamesLiveContainer.innerHTML = `
+          <h2>Jogos a decorrer</h2>
+          <small>Atualizado em tempo real via live ScoreBoard.</small>
+          <table>
+            <thead>
+              <tr>
+                <th>Jogo</th>
+                <th>Estado</th>
+                <th>Registos</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${live.map(g => {
+                const home = g.home || {};
+                const away = g.away || {};
+                const statusText = g.status_text || "";
+                const clock = g.clock || "";
+                const period = g.period || "";
+                const state = clock && period
+                  ? `${statusText} (${clock}, Q${period})`
+                  : statusText || "A decorrer";
+
+                const scoreStr = `${escapeHtml(away.tricode || "")} ${away.score ?? 0} @ ${escapeHtml(home.tricode || "")} ${home.score ?? 0}`;
+                const records = `${home.record || ""} vs ${away.record || ""}`;
+
+                return `
+                  <tr>
+                    <td>${scoreStr}</td>
+                    <td>${escapeHtml(state)}</td>
+                    <td>${escapeHtml(records)}</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      // --- Próximos jogos (hoje + amanhã) ---
+      const upcomingCombined = [...todayUpcoming, ...tomorrowUpcoming];
+
+      if (upcomingCombined.length === 0) {
+        gamesUpcomingContainer.innerHTML = `
+          <h2>Próximos jogos (hoje + amanhã)</h2>
+          <small>Não há jogos agendados nas próximas 24h.</small>
+        `;
+        if (countdownTimer) {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+        }
+      } else {
+        gamesUpcomingContainer.innerHTML = `
+          <h2>Próximos jogos (hoje + amanhã)</h2>
+          <small>
+            Inclui jogos de hoje ainda por começar e jogos de amanhã com status agendado.
+          </small>
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Hora (local)</th>
+                <th>Jogo</th>
+                <th>Countdown</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${upcomingCombined.map(g => {
+                const home = g.home || {};
+                const away = g.away || {};
+                const matchup = `${escapeHtml(away.tricode || "")} @ ${escapeHtml(home.tricode || "")}`;
+                const startIso = g.start_time_utc || "";
+                const dateStr = formatLocalDate(startIso, g.date || "");
+                const timeStr = formatLocalTime(startIso, g.time_local || "");
+                const countdown = formatCountdown(startIso);
+                const key = getGameKey(g);
+                const isSelected = selectedGame && getGameKey(selectedGame) === key;
+
+                return `
+                  <tr class="selectable-row${isSelected ? " selected-row" : ""}" data-game-key="${escapeHtml(key)}">
+                    <td>${escapeHtml(dateStr)}</td>
+                    <td>${escapeHtml(timeStr)}</td>
+                    <td>${matchup}</td>
+                    <td class="countdown" data-start-utc="${escapeHtml(startIso)}">${escapeHtml(countdown)}</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        `;
+        const rows = gamesUpcomingContainer.querySelectorAll("tbody tr");
+        rows.forEach((row, idx) => {
+          const g = upcomingCombined[idx];
+          row.addEventListener("click", () => {
+            selectedGame = g;
+            renderAnalysisTab();
+            if (standingsData) renderTables(standingsData);
+            renderStandingsTab();
+            switchTab("analysis");
+            highlightSelectedGameRow();
+          });
+        });
+        startCountdownTicker();
+      }
+    }
+
+    function renderAnalysisTab() {
+      if (!analysisContainer) return;
+
+      if (!selectedGame) {
+        analysisContainer.innerHTML = `
+          Escolha um jogo na lista de jogos para ver detalhes e destacar as equipas nos standings.
+        `;
+        return;
+      }
+
+      const home = selectedGame.home || {};
+      const away = selectedGame.away || {};
+      const homeCode = (home.tricode || "").toUpperCase();
+      const awayCode = (away.tricode || "").toUpperCase();
+      const findStanding = (teamObj) => {
+        if (!standingsMaps || !teamObj) return null;
+        const code = (teamObj.tricode || "").toUpperCase();
+        const tid = teamObj.id ? Number(teamObj.id) : null;
+        const nameUpper = (teamObj.name || "").toUpperCase();
+        const cityUpper = (teamObj.city || "").toUpperCase();
+
+        if (tid && standingsMaps.byId[tid]) return standingsMaps.byId[tid];
+        if (code) {
+          if (standingsMaps.byCode[code]) return standingsMaps.byCode[code];
+          if (standingsMaps.bySlug[code]) return standingsMaps.bySlug[code];
+        }
+        if (nameUpper) {
+          if (standingsMaps.byName[nameUpper]) return standingsMaps.byName[nameUpper];
+          const lastWord = nameUpper.split(" ").pop();
+          const found = Object.keys(standingsMaps.byName).find(k => k.endsWith(" " + lastWord));
+          if (found) return standingsMaps.byName[found];
+          if (cityUpper) {
+            const cityMatch = Object.keys(standingsMaps.byName).find(k => k.startsWith(cityUpper + " "));
+            if (cityMatch) return standingsMaps.byName[cityMatch];
+          }
+        }
+        return null;
+      };
+
+      const homeStanding = findStanding(home);
+      const awayStanding = findStanding(away);
+      const homeLeagueRank = homeStanding ? (homeStanding.league_rank || homeStanding.league_rank_calc || "-") : "-";
+      const homeConfRank = homeStanding ? (homeStanding.conf_rank || homeStanding.conf_rank_calc || "-") : "-";
+      const homeLeagueRankHome = homeStanding ? (homeStanding.league_rank_home || homeStanding.league_rank_home_calc || "-") : "-";
+      const homeConfRankHome = homeStanding ? (homeStanding.conf_rank_home || homeStanding.conf_rank_home_calc || "-") : "-";
+      const awayLeagueRank = awayStanding ? (awayStanding.league_rank || awayStanding.league_rank_calc || "-") : "-";
+      const awayConfRank = awayStanding ? (awayStanding.conf_rank || awayStanding.conf_rank_calc || "—") : "—";
+      const awayLeagueRankAway = awayStanding ? (awayStanding.league_rank_away || awayStanding.league_rank_away_calc || "—") : "—";
+      const awayConfRankAway = awayStanding ? (awayStanding.conf_rank_away || awayStanding.conf_rank_away_calc || "—") : "—";
+      const startIso = selectedGame.start_time_utc || "";
+      const dateStr = formatLocalDate(startIso, selectedGame.date || "");
+      const timeStr = formatLocalTime(startIso, selectedGame.time_local || "");
+      const countdown = formatCountdown(startIso);
+      const status = selectedGame.status_text || "Agendado";
+      const arenaName = selectedGame.arena || ARENAS_BY_TEAM[homeCode] || ARENAS_BY_TEAM[awayCode] || "-";
+      const arenaCity = selectedGame.arena_city || "";
+      const arenaFull = arenaCity ? `${arenaName} (${arenaCity})` : arenaName;
+      const matchup = `${escapeHtml(awayCode || "")} @ ${escapeHtml(homeCode || "")}`;
+      const preds = buildPredictions(homeCode, awayCode);
+      const overLines = preds && preds.sdTot > 0
+        ? [
+            { label: `Total ${Math.round(preds.eTot)}`, line: Math.round(preds.eTot) },
+            { label: `Total ${Math.round(preds.eTot) + 5}`, line: Math.round(preds.eTot) + 5 },
+            { label: `Total ${Math.round(preds.eTot) - 5}`, line: Math.round(preds.eTot) - 5 },
+          ]
+        : [];
+      const quarterProbTable = preds && preds.qSd
+        ? ["Q1","Q2","Q3","Q4"].map(q => {
+            const qExp = preds.quarters[q].total;
+            const qSd = preds.qSd[q] || 0;
+            return {
+              q,
+              exp: qExp,
+              sd: qSd,
+              probs: [
+                { label: `${Math.round(qExp) - 2}`, line: Math.round(qExp) - 2 },
+                { label: `${Math.round(qExp)}`, line: Math.round(qExp) },
+                { label: `${Math.round(qExp) + 2}`, line: Math.round(qExp) + 2 },
+              ].map(l => ({
+                ...l,
+                p: qSd > 0 ? probOver(qExp, qSd, l.line) : null,
+              })),
+            };
+          })
+        : [];
+      const teamProbTable = preds
+        ? [
+            {
+              label: `Casa ${homeCode}`,
+              exp: preds.ePtsHome,
+              sd: preds.homeStr.home.sd_for || 0,
+            },
+            {
+              label: `Fora ${awayCode}`,
+              exp: preds.ePtsAway,
+              sd: preds.awayStr.away.sd_for || 0,
+            },
+          ]
+        : [];
+
+      const renderTeamPanel = (code, roleLabel, teamInfo) => {
+        if (!code) return `<div class="card"><div class="info">Equipa em falta.</div></div>`;
+        const filter = teamFilters[code] || "all";
+        const lastGames = getLastGames(code, filter, 5);
+        const averages = calcAverages(lastGames);
+        const recent = summarizeRecentGames(code, 5);
+        const quarterScopeAllowed = roleLabel === "Casa" ? ["all", "home"] : ["all", "away"];
+        if (!teamQuarterScope[code]) teamQuarterScope[code] = quarterScopeAllowed[0];
+        const qScope = teamQuarterScope[code];
+        const quarterRows = buildQuarterRows(code, qScope);
+        const quarterScopeButtons = quarterScopeAllowed.map(s => `
+          <button class="chip quarter-filter ${qScope === s ? "active" : ""}" data-team="${escapeHtml(code)}" data-qscope="${s}">
+            ${s === "all" ? "Todos" : s === "home" ? "Só casa" : "Só fora"}
+          </button>
+        `).join("");
+
+        return `
+          <div class="team-panel" data-team="${escapeHtml(code)}" style="display:flex; flex-direction:column; gap:10px;">
+            <div class="app-header" style="margin-bottom:6px; gap:8px;">
+              <div>
+                <div><strong>${escapeHtml(roleLabel)}:</strong> ${escapeHtml(code)} ${teamInfo?.name ? "– " + escapeHtml(teamInfo.name) : ""}</div>
+              </div>
+              <div class="chip-group">
+                ${["all","home","away"].map(f => `
+                  <button class="chip team-filter ${filter === f ? "active" : ""}" data-team="${escapeHtml(code)}" data-filter="${f}">
+                    ${f === "all" ? "Todos" : f === "home" ? "Casa" : "Fora"}
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+            <div class="analysis-section">
+              <small>Últimos 5 jogos (${filter === "all" ? "todos" : filter === "home" ? "casa" : "fora"})</small>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Loc</th>
+                    <th>Adversário</th>
+                    <th>Resultado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${lastGames.length ? lastGames.map(g => `
+                    <tr>
+                      <td>${formatLocalDate(g.date, "")}</td>
+                      <td>${g.location === "home" ? "Casa" : g.location === "away" ? "Fora" : "-"}</td>
+                      <td>${escapeHtml(g.opponent || "")}</td>
+                      <td>${g.result} ${g.ptsFor}-${g.ptsAgainst}</td>
+                    </tr>
+                  `).join("") : `<tr><td colspan="4">Sem jogos recentes</td></tr>`}
+                </tbody>
+              </table>
+              <div class="summary">
+                Médias (filtro): PF ${averages.forAvg.toFixed(1)} | PA ${averages.againstAvg.toFixed(1)}
+              </div>
+              <div class="info" style="margin-top:4px;">${recent}</div>
+            </div>
+            <div class="analysis-section">
+              <div class="chip-group" style="margin-bottom:6px;">
+                ${quarterScopeButtons}
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Período</th>
+                    <th>Total PF</th>
+                    <th>Total PA</th>
+                    <th>Média PF</th>
+                    <th>Média PA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${quarterRows ? quarterRows.map(r => `
+                    <tr>
+                      <td>${r.label}</td>
+                      <td>${Math.round(r.forTotal)}</td>
+                      <td>${Math.round(r.againstTotal)}</td>
+                      <td>${r.forAvg.toFixed(1)}</td>
+                      <td>${r.againstAvg.toFixed(1)}</td>
+                    </tr>
+                  `).join("") : `<tr><td colspan="5">Sem dados de quartos.</td></tr>`}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      };
+
+      let oddsSection = `<div class="info">Odds ainda não carregadas ou indisponíveis.</div>`;
+      analysisContainer.innerHTML = `
+        <div class="analysis-meta card">
+          <div><strong>Jogo:</strong> ${matchup}</div>
+          <div><strong>Data/Hora:</strong> ${escapeHtml(dateStr)} ${escapeHtml(timeStr)}</div>
+          <div><strong>Countdown:</strong> ${escapeHtml(countdown)}</div>
+          <div><strong>Estado:</strong> ${escapeHtml(status)}</div>
+          <div><strong>Arena:</strong> ${escapeHtml(arenaFull)}</div>
+          <div class="info" style="grid-column:1 / -1;">Equipas destacadas nas tabelas de quartos/OT.</div>
+        </div>
+        <div class="card">
+          <h2>Projeções (modelo simples, sem odds)</h2>
+          ${preds ? `
+            <div class="summary">
+              Total projetado: <strong>${preds.eTot.toFixed(1)}</strong> | Casa: ${preds.ePtsHome.toFixed(1)} | Fora: ${preds.ePtsAway.toFixed(1)}
+              ${Number.isFinite(preds.sdTot) && preds.sdTot > 0 ? `(SD total ~ ${preds.sdTot.toFixed(1)})` : ""}
+            </div>
+            <div class="summary">
+              Ritmo (proxy pontos/jogo): Casa ${preds.homeStr.home.pace.toFixed(1)} | Fora ${preds.awayStr.away.pace.toFixed(1)} | Liga H ${preds.league.pace_home.toFixed(1)} / A ${preds.league.pace_away.toFixed(1)}
+            </div>
+            <div class="analysis-section">
+              <small>Forças com shrink (k=${PREDICT_K})</small>
+              <table>
+                <thead>
+                  <tr><th></th><th>Off</th><th>Def</th><th>Pace</th><th>J</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Casa (H)</td><td>${preds.homeStr.home.off.toFixed(1)}</td><td>${preds.homeStr.home.def.toFixed(1)}</td><td>${preds.homeStr.home.pace.toFixed(1)}</td><td>${preds.homeStr.home.games}</td></tr>
+                  <tr><td>Fora (A)</td><td>${preds.awayStr.away.off.toFixed(1)}</td><td>${preds.awayStr.away.def.toFixed(1)}</td><td>${preds.awayStr.away.pace.toFixed(1)}</td><td>${preds.awayStr.away.games}</td></tr>
+                  <tr><td>Liga H/A</td><td>${preds.league.off_home.toFixed(1)} / ${preds.league.off_away.toFixed(1)}</td><td>${preds.league.def_home.toFixed(1)} / ${preds.league.def_away.toFixed(1)}</td><td>${preds.league.pace_home.toFixed(1)} / ${preds.league.pace_away.toFixed(1)}</td><td>-</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <table>
+              <thead>
+                <tr><th>Período</th><th>Casa</th><th>Fora</th><th>Total</th></tr>
+              </thead>
+              <tbody>
+                ${["Q1","Q2","Q3","Q4"].map(q => `
+                  <tr>
+                    <td>${q}</td>
+                    <td>${preds.quarters[q].home.toFixed(1)}</td>
+                    <td>${preds.quarters[q].away.toFixed(1)}</td>
+                    <td>${preds.quarters[q].total.toFixed(1)}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+            ${overLines.length ? `
+              <div class="analysis-section">
+                <small>Prob. Over Total (Normal aprox., usa SD de pontos marcados)</small>
+                <table>
+                  <thead><tr><th>Linha</th><th>P(Over)</th></tr></thead>
+                  <tbody>
+                    ${overLines.map(l => {
+                      const p = probOver(preds.eTot, preds.sdTot, l.line);
+                      const pct = p !== null ? (p * 100).toFixed(1) + "%" : "—";
+                      return `<tr><td>${l.label}</td><td>${pct}</td></tr>`;
+                    }).join("")}
+                  </tbody>
+                </table>
+              </div>
+            ` : ""}
+            ${teamProbTable.length ? `
+              <div class="analysis-section">
+                <small>Prob. Over por equipa (linha = projeção, variação ±5)</small>
+                <table>
+                  <thead><tr><th>Equipa</th><th>Linha</th><th>P(Over)</th></tr></thead>
+                  <tbody>
+                    ${teamProbTable.map(t => {
+                      const base = Math.round(t.exp);
+                      const lines = [base - 5, base, base + 5];
+                      return lines.map(line => {
+                        const p = t.sd > 0 ? probOver(t.exp, t.sd, line) : null;
+                        const pct = p !== null ? (p * 100).toFixed(1) + "%" : "—";
+                        return `<tr><td>${t.label}</td><td>${line}</td><td>${pct}</td></tr>`;
+                      }).join("");
+                    }).join("")}
+                  </tbody>
+                </table>
+              </div>
+            ` : ""}
+            ${quarterProbTable.length ? `
+              <div class="analysis-section">
+                <small>Prob. Over por quarto (linha = projeção ±2)</small>
+                <table>
+                  <thead><tr><th>Q</th><th>Linha</th><th>P(Over)</th></tr></thead>
+                  <tbody>
+                    ${quarterProbTable.map(q => q.probs.map(p => {
+                      const pct = p.p !== null ? (p.p * 100).toFixed(1) + "%" : "—";
+                      return `<tr><td>${q.q}</td><td>${p.label}</td><td>${pct}</td></tr>`;
+                    }).join("")).join("")}
+                  </tbody>
+                </table>
+              </div>
+            ` : ""}
+          ` : `<div class="info">Sem dados suficientes para projetar (precisa de histórico de jogos das duas equipas).</div>`}
+        </div>
+        <div class="analysis-columns">
+          <div class="analysis-col">
+            <h3>Casa</h3>
+            <div><strong>Equipa:</strong> ${escapeHtml(homeCode || "-")} ${home.name ? "- " + escapeHtml(home.name) : ""}</div>
+            <div><strong>Ranking geral:</strong> ${homeLeagueRank}</div>
+            <div><strong>Ranking conferência:</strong> ${homeConfRank}</div>
+            <div><strong>Ranking só em casa (Liga/Conf):</strong> ${homeStanding ? `${homeLeagueRankHome} / ${homeConfRankHome}` : "—"}</div>
+            ${renderTeamPanel(homeCode, "Casa", home)}
+          </div>
+          <div class="analysis-col">
+            <h3>Fora</h3>
+            <div><strong>Equipa:</strong> ${escapeHtml(awayCode || "-")} ${away.name ? "– " + escapeHtml(away.name) : ""}</div>
+            <div><strong>Ranking geral:</strong> ${awayLeagueRank}</div>
+            <div><strong>Ranking conferência:</strong> ${awayConfRank}</div>
+            <div><strong>Ranking só fora (Liga/Conf):</strong> ${awayStanding ? `${awayLeagueRankAway} / ${awayConfRankAway}` : "—"}</div>
+            ${renderTeamPanel(awayCode, "Fora", away)}
+          </div>
+        </div>
+      `;
+
+      const filterButtons = analysisContainer.querySelectorAll(".team-filter");
+      filterButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const team = (btn.getAttribute("data-team") || "").toUpperCase();
+          const filter = btn.getAttribute("data-filter") || "all";
+          teamFilters[team] = filter;
+          renderAnalysisTab();
+        });
+      });
+
+      const quarterButtons = analysisContainer.querySelectorAll(".quarter-filter");
+      quarterButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const team = (btn.getAttribute("data-team") || "").toUpperCase();
+          const scope = btn.getAttribute("data-qscope") || "all";
+          teamQuarterScope[team] = scope;
+          renderAnalysisTab();
+        });
+      });
+
+      highlightSelectedGameRow();
+    }
+  </script>
+</body>
+</html>
