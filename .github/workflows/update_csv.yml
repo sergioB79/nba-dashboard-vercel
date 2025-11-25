@@ -1,0 +1,48 @@
+name: Update NBA CSV
+
+on:
+  schedule:
+    # Corre todos os dias às 05:00 UTC (ajusta se quiseres)
+    - cron: '0 5 * * *'
+  # Permite correr manualmente a partir do separador "Actions"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-csv:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies for getQuarters
+        run: |
+          python -m pip install --upgrade pip
+          pip install nba_api pandas
+
+      - name: Run getQuarters.py
+        run: python getQuarters.py
+
+      - name: Commit and push if CSV changed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data/nba_quarters_202526.csv
+          git commit -m "Auto-update CSV from GitHub Actions"
+          git push
