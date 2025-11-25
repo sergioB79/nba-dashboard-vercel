@@ -1,12 +1,10 @@
 import os
 import csv
+import json
 import collections
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 
 from flask import Flask, jsonify, Response, send_from_directory
-
-# Usamos scoreboardv3 (stats) para jogos de hoje + amanhã
-from nba_api.stats.endpoints import scoreboardv3
 
 # -----------------------------------------------------------------------------
 # Configuração básica
@@ -16,8 +14,11 @@ app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# CSV estático dentro da pasta data/
+# CSV estático com quartos / standings
 CSV_PATH = os.path.join(BASE_DIR, "data", "nba_quarters_202526.csv")
+
+# JSON estático com jogos (criado pelo getGames.py via GitHub Actions)
+GAMES_JSON_PATH = os.path.join(BASE_DIR, "data", "games_cache.json")
 
 # Conferência por equipa (tricode)
 CONF_BY_TRICODE = {
@@ -30,7 +31,7 @@ CONF_BY_TRICODE = {
 }
 
 # -----------------------------------------------------------------------------
-# Helpers gerais
+# Helpers
 # -----------------------------------------------------------------------------
 
 def safe_int(value, default=None):
@@ -55,112 +56,6 @@ def compute_streak(results):
             break
     sign = "+" if last == "W" else "-"
     return f"{sign}{count}"
-
-
-# -----------------------------------------------------------------------------
-# Jogos de hoje + amanhã via ScoreboardV3
-# -----------------------------------------------------------------------------
-
-def get_live_and_upcoming_games_from_scoreboardv3():
-    """
-    Usa ScoreboardV3 para:
-      - Jogos de HOJE (live + agendados)
-      - Jogos de AMANHÃ (agendados)
-
-    Devolve:
-      live_games, today_upcoming, tomorrow_upcoming, warnings
-    """
-    warnings = []
-
-    today = datetime.now(timezone.utc).date()
-    tomorrow = today + timedelta(days=1)
-
-    def _simplify_team(team_dict):
-        if not team_dict:
-            return {
-                "team_id": None,
-                "tricode": "",
-                "city": "",
-                "name": "",
-                "score": 0,
-                "wins": None,
-                "losses": None,
-                "record": "",
-            }
-
-        wins = team_dict.get("wins")
-        losses = team_dict.get("losses")
-
-        if wins is not None and losses is not None:
-            record = f"{wins}-{losses}"
-        else:
-            record = ""
-
-        return {
-            "team_id": safe_int(team_dict.get("teamId")),
-            "tricode": team_dict.get("teamTricode") or "",
-            "city": team_dict.get("teamCity") or "",
-            "name": team_dict.get("teamName") or "",
-            "score": safe_int(team_dict.get("score"), default=0),
-            "wins": safe_int(wins),
-            "losses": safe_int(losses),
-            "record": record,
-        }
-
-    def _fetch_day(day):
-        day_str = day.strftime("%Y-%m-%d")
-        try:
-            sb = scoreboardv3.ScoreboardV3(game_date=day_str, league_id="00", timeout=8)
-            data = sb.get_dict()
-            games = data.get("scoreboard", {}).get("games", [])
-        except Exception as e:  # noqa: BLE001
-            msg = f"Erro ao obter ScoreboardV3 para {day_str}: {e}"
-            print(msg)
-            warnings.append(msg)
-            return [], []
-
-        live_list = []
-        upcoming_list = []
-
-        for g in games:
-            status = safe_int(g.get("gameStatus"), default=0)
-            # 1 = agendado, 2 = live, 3 = final
-            if status not in (1, 2):
-                continue
-
-            home = _simplify_team(g.get("homeTeam") or {})
-            away = _simplify_team(g.get("awayTeam") or {})
-
-            period_raw = g.get("period")
-            if isinstance(period_raw, dict):
-                period = period_raw.get("current") or period_raw.get("period")
-            else:
-                period = period_raw
-
-            simple = {
-                "game_id": g.get("gameId"),
-                "status": status,
-                "status_text": g.get("gameStatusText") or "",
-                "start_time_utc": g.get("gameTimeUTC"),
-                "date": day_str,
-                "time_local": g.get("gameTimeLocal") or "",
-                "period": safe_int(period, 0),
-                "clock": g.get("gameClock") or "",
-                "home": home,
-                "away": away,
-            }
-
-            if status == 2:
-                live_list.append(simple)
-            elif status == 1:
-                upcoming_list.append(simple)
-
-        return live_list, upcoming_list
-
-    live_today, today_upcoming = _fetch_day(today)
-    _, tomorrow_upcoming = _fetch_day(tomorrow)
-
-    return live_today, today_upcoming, tomorrow_upcoming, warnings
 
 
 # -----------------------------------------------------------------------------
@@ -340,39 +235,31 @@ def quarters_csv():
     except Exception as exc:  # noqa: BLE001
         return jsonify({"error": f"Falha ao ler CSV: {exc}"}), 500
 
-
 @app.route("/api/games")
 def api_games():
-    """
-    Endpoint blindado: nunca manda 500, mesmo que a NBA rebente.
-    """
-    try:
-        live_games, today_upcoming, tomorrow_upcoming, warnings = (
-            get_live_and_upcoming_games_from_scoreboardv3()
-        )
-        has_any = bool(live_games or today_upcoming or tomorrow_upcoming)
-        data = {
-            "ok": has_any,
-            "live_games": live_games,
-            "today_upcoming": today_upcoming,
-            "tomorrow_upcoming": tomorrow_upcoming,
-            "warnings": warnings,
-            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        }
-        return jsonify(data)
-    except Exception as exc:  # noqa: BLE001
-        msg = f"Erro inesperado em /api/games: {exc}"
-        print(msg)
-        data = {
+    if not os.path.exists(GAMES_JSON_PATH):
+        return jsonify({
             "ok": False,
             "live_games": [],
             "today_upcoming": [],
             "tomorrow_upcoming": [],
-            "warnings": [msg],
-            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        }
-        # devolvemos 200 para o frontend não dar "Erro ao carregar /api/games"
+            "warnings": ["games_cache.json não encontrado"],
+            "generated_at_utc": datetime.now(timezone.utc).isoformat()
+        })
+
+    try:
+        with open(GAMES_JSON_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
         return jsonify(data)
+    except Exception as e:
+        return jsonify({
+            "ok": False,
+            "live_games": [],
+            "today_upcoming": [],
+            "tomorrow_upcoming": [],
+            "warnings": [str(e)],
+            "generated_at_utc": datetime.now(timezone.utc).isoformat()
+        })
 
 
 @app.route("/api/standings")

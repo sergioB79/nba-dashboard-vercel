@@ -23,15 +23,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies for getQuarters
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install nba_api pandas
+          pip install nba_api pandas requests
 
       - name: Run getQuarters.py
         run: python getQuarters.py
 
-      - name: Commit and push if CSV changed
+      - name: Run getGames.py
+        run: python getGames.py
+
+      - name: Commit and push if data changed
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -43,6 +46,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/nba_quarters_202526.csv
-          git commit -m "Auto-update CSV from GitHub Actions"
+          git add data/nba_quarters_202526.csv data/games_cache.json
+          git commit -m "Auto-update NBA CSV and games from GitHub Actions"
           git push
