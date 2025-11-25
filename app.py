@@ -1,12 +1,11 @@
 import os
 import csv
 import collections
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from flask import Flask, jsonify, Response, send_from_directory
 
-# NBA API (apenas para jogos live / agendados)
-from nba_api.live.nba.endpoints import scoreboard as live_scoreboard
+from nba_api.stats.endpoints import scoreboardv3
 
 # -----------------------------------------------------------------------------
 # Configuração básica
@@ -58,83 +57,108 @@ def compute_streak(results):
 
 
 # -----------------------------------------------------------------------------
-# Helpers para LIVE scoreboard
+# Jogos de hoje + amanhã via ScoreboardV3
 # -----------------------------------------------------------------------------
 
-def simplify_live_team(team_dict):
-    """Normaliza estrutura da equipa vinda do live ScoreBoard()."""
-    wins = team_dict.get("wins") or team_dict.get("teamWins")
-    losses = team_dict.get("losses") or team_dict.get("teamLosses")
-
-    if wins is not None and losses is not None:
-        record = f"{wins}-{losses}"
-    else:
-        record = ""
-
-    return {
-        "team_id": team_dict.get("teamId"),
-        "tricode": team_dict.get("teamTricode"),
-        "city": team_dict.get("teamCity"),
-        "name": team_dict.get("teamName"),
-        "score": safe_int(team_dict.get("score"), 0),
-        "wins": safe_int(wins),
-        "losses": safe_int(losses),
-        "record": record,
-    }
-
-
-def simplify_live_game(game_dict):
-    """Normaliza um jogo da estrutura do live ScoreBoard()."""
-    home_raw = game_dict.get("homeTeam", {}) or {}
-    away_raw = game_dict.get("awayTeam", {}) or {}
-
-    home = simplify_live_team(home_raw)
-    away = simplify_live_team(away_raw)
-
-    period_raw = game_dict.get("period")
-    if isinstance(period_raw, dict):
-        period = period_raw.get("current") or period_raw.get("period")
-    else:
-        period = period_raw
-
-    return {
-        "game_id": game_dict.get("gameId"),
-        "status": game_dict.get("gameStatus"),
-        "status_text": game_dict.get("gameStatusText") or "",
-        "period": safe_int(period, 0),
-        "clock": game_dict.get("gameClock") or "",
-        "start_time_utc": game_dict.get("gameTimeUTC"),
-        "home": home,
-        "away": away,
-    }
-
-
-def fetch_today_games_from_live():
+def get_live_and_upcoming_games_from_scoreboardv3():
     """
-    Usa nba_api.live.nba.endpoints.scoreboard.ScoreBoard()
-    para devolver:
-      - live_games: em andamento ou concluídos
-      - today_upcoming: agendados para hoje
+    Usa o endpoint stats ScoreboardV3 para:
+      - Jogos de HOJE (live + agendados)
+      - Jogos de AMANHÃ (agendados)
+
+    Devolve:
+      live_games, today_upcoming, tomorrow_upcoming, warnings
     """
-    live_games = []
-    today_upcoming = []
     warnings = []
 
-    try:
-        sb = live_scoreboard.ScoreBoard()
-        games = sb.games.get_dict()  # lista de jogos
-        for g in games:
-            simplified = simplify_live_game(g)
-            status = g.get("gameStatus")
-            # gameStatus == 1 → agendado; 2 / 3 → em jogo / final
-            if status == 1:
-                today_upcoming.append(simplified)
-            else:
-                live_games.append(simplified)
-    except Exception as exc:  # noqa: BLE001
-        warnings.append(f"Erro ao obter live scoreboard: {exc}")
+    today = datetime.now(timezone.utc).date()
+    tomorrow = today + timedelta(days=1)
 
-    return live_games, today_upcoming, warnings
+    def _simplify_team(team_dict):
+        if not team_dict:
+            return {
+                "team_id": None,
+                "tricode": "",
+                "city": "",
+                "name": "",
+                "score": 0,
+                "wins": None,
+                "losses": None,
+                "record": "",
+            }
+
+        wins = team_dict.get("wins")
+        losses = team_dict.get("losses")
+        if wins is not None and losses is not None:
+            record = f"{wins}-{losses}"
+        else:
+            record = ""
+
+        return {
+            "team_id": safe_int(team_dict.get("teamId")),
+            "tricode": team_dict.get("teamTricode") or "",
+            "city": team_dict.get("teamCity") or "",
+            "name": team_dict.get("teamName") or "",
+            "score": safe_int(team_dict.get("score"), default=0),
+            "wins": safe_int(wins),
+            "losses": safe_int(losses),
+            "record": record,
+        }
+
+    def _fetch_day(day):
+        day_str = day.strftime("%Y-%m-%d")
+        try:
+            sb = scoreboardv3.ScoreboardV3(game_date=day_str, league_id="00", timeout=8)
+            data = sb.get_dict()
+            games = data.get("scoreboard", {}).get("games", [])
+        except Exception as e:  # noqa: BLE001
+            msg = f"Erro ao obter ScoreboardV3 para {day_str}: {e}"
+            print(msg)
+            warnings.append(msg)
+            return [], []
+
+        live_list = []
+        upcoming_list = []
+
+        for g in games:
+            status = safe_int(g.get("gameStatus"), default=0)
+            # 1 = agendado, 2 = live, 3 = final
+            if status not in (1, 2):
+                continue
+
+            home = _simplify_team(g.get("homeTeam") or {})
+            away = _simplify_team(g.get("awayTeam") or {})
+
+            period_raw = g.get("period")
+            if isinstance(period_raw, dict):
+                period = period_raw.get("current") or period_raw.get("period")
+            else:
+                period = period_raw
+
+            simple = {
+                "game_id": g.get("gameId"),
+                "status": status,
+                "status_text": g.get("gameStatusText") or "",
+                "start_time_utc": g.get("gameTimeUTC"),
+                "date": day_str,
+                "time_local": g.get("gameTimeLocal") or "",
+                "period": safe_int(period, 0),
+                "clock": g.get("gameClock") or "",
+                "home": home,
+                "away": away,
+            }
+
+            if status == 2:
+                live_list.append(simple)
+            elif status == 1:
+                upcoming_list.append(simple)
+
+        return live_list, upcoming_list
+
+    live_today, today_upcoming = _fetch_day(today)
+    _, tomorrow_upcoming = _fetch_day(tomorrow)
+
+    return live_today, today_upcoming, tomorrow_upcoming, warnings
 
 
 # -----------------------------------------------------------------------------
@@ -343,20 +367,26 @@ def api_games():
         ok: true/false,
         live_games: [...],
         today_upcoming: [...],
-        tomorrow_upcoming: [],   # por agora fica vazio
-        warnings: [...]
+        tomorrow_upcoming: [...],
+        warnings: [...],
+        generated_at_utc: "..."
       }
     """
-    live_games, today_upcoming, warnings = fetch_today_games_from_live()
+    live_games, today_upcoming, tomorrow_upcoming, warnings = (
+        get_live_and_upcoming_games_from_scoreboardv3()
+    )
+
+    has_any = bool(live_games or today_upcoming or tomorrow_upcoming)
 
     data = {
-        "ok": True,
+        "ok": has_any,
         "live_games": live_games,
         "today_upcoming": today_upcoming,
-        # Para já não usamos scoreboardv3 – menos sources de bug.
-        "tomorrow_upcoming": [],
+        "tomorrow_upcoming": tomorrow_upcoming,
         "warnings": warnings,
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
     }
+
     return jsonify(data)
 
 
