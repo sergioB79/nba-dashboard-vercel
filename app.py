@@ -169,11 +169,7 @@ def get_live_and_upcoming_games_from_scoreboardv3():
 
 def compute_standings_from_csv():
     """
-    Lê o ficheiro nba_quarters_202526.csv e calcula standings por equipa:
-      - wins, losses
-      - home/away record
-      - streak geral, casa, fora
-      - conferência (East/West)
+    Lê o ficheiro nba_quarters_202526.csv e calcula standings por equipa.
     """
     warnings = []
     rows_final = []
@@ -220,23 +216,19 @@ def compute_standings_from_csv():
 
         for gid, team_rows in games.items():
             if len(team_rows) != 2:
-                # jogos estranhos (não deviam acontecer)
                 continue
 
             a, b = team_rows
             matchup = a.get("MATCHUP") or b.get("MATCHUP") or ""
             parts = matchup.split()
             if "@" in parts:
-                # "HOU @ OKC"
                 away_code = parts[0]
                 home_code = parts[-1]
             else:
-                # assumir "X vs. Y"
                 if len(parts) >= 3:
                     home_code = parts[0]
                     away_code = parts[-1]
                 else:
-                    # fallback tosco
                     home_code = a.get("TEAM_ABBREVIATION")
                     away_code = b.get("TEAM_ABBREVIATION")
 
@@ -255,7 +247,6 @@ def compute_standings_from_csv():
             elif home_pts < away_pts:
                 home_result, away_result = "L", "W"
             else:
-                # empate não existe na NBA; ignorar
                 continue
 
             for row, is_home, result in [
@@ -289,7 +280,6 @@ def compute_standings_from_csv():
                 else:
                     s["away_results"].append(result)
 
-        # Construir linhas finais
         for team_id, s in team_stats.items():
             wins = s["wins"]
             losses = s["losses"]
@@ -353,22 +343,36 @@ def quarters_csv():
 
 @app.route("/api/games")
 def api_games():
-    live_games, today_upcoming, tomorrow_upcoming, warnings = (
-        get_live_and_upcoming_games_from_scoreboardv3()
-    )
-
-    has_any = bool(live_games or today_upcoming or tomorrow_upcoming)
-
-    data = {
-        "ok": has_any,
-        "live_games": live_games,
-        "today_upcoming": today_upcoming,
-        "tomorrow_upcoming": tomorrow_upcoming,
-        "warnings": warnings,
-        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-    }
-
-    return jsonify(data)
+    """
+    Endpoint blindado: nunca manda 500, mesmo que a NBA rebente.
+    """
+    try:
+        live_games, today_upcoming, tomorrow_upcoming, warnings = (
+            get_live_and_upcoming_games_from_scoreboardv3()
+        )
+        has_any = bool(live_games or today_upcoming or tomorrow_upcoming)
+        data = {
+            "ok": has_any,
+            "live_games": live_games,
+            "today_upcoming": today_upcoming,
+            "tomorrow_upcoming": tomorrow_upcoming,
+            "warnings": warnings,
+            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        }
+        return jsonify(data)
+    except Exception as exc:  # noqa: BLE001
+        msg = f"Erro inesperado em /api/games: {exc}"
+        print(msg)
+        data = {
+            "ok": False,
+            "live_games": [],
+            "today_upcoming": [],
+            "tomorrow_upcoming": [],
+            "warnings": [msg],
+            "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        }
+        # devolvemos 200 para o frontend não dar "Erro ao carregar /api/games"
+        return jsonify(data)
 
 
 @app.route("/api/standings")
