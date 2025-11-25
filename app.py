@@ -1,12 +1,12 @@
 import os
 import csv
 import collections
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from flask import Flask, jsonify, Response, send_from_directory
 
-# NBA API – só usamos o live ScoreBoard (funciona bem no Vercel)
-from nba_api.live.nba.endpoints import scoreboard as live_scoreboard
+# Usamos scoreboardv3 (stats) para jogos de hoje + amanhã
+from nba_api.stats.endpoints import scoreboardv3
 
 # -----------------------------------------------------------------------------
 # Configuração básica
@@ -58,100 +58,113 @@ def compute_streak(results):
 
 
 # -----------------------------------------------------------------------------
-# Jogos de hoje via live ScoreBoard (sem scoreboardv3)
+# Jogos de hoje + amanhã via ScoreboardV3
 # -----------------------------------------------------------------------------
 
-def simplify_live_team(team_dict):
-    """Normaliza estrutura da equipa vinda do live ScoreBoard()."""
-    if not team_dict:
-        return {
-            "team_id": None,
-            "tricode": "",
-            "city": "",
-            "name": "",
-            "score": 0,
-            "wins": None,
-            "losses": None,
-            "record": "",
-        }
-
-    wins = team_dict.get("wins") or team_dict.get("teamWins")
-    losses = team_dict.get("losses") or team_dict.get("teamLosses")
-
-    if wins is not None and losses is not None:
-        record = f"{wins}-{losses}"
-    else:
-        record = ""
-
-    return {
-        "team_id": safe_int(team_dict.get("teamId")),
-        "tricode": team_dict.get("teamTricode") or "",
-        "city": team_dict.get("teamCity") or "",
-        "name": team_dict.get("teamName") or "",
-        "score": safe_int(team_dict.get("score"), 0),
-        "wins": safe_int(wins),
-        "losses": safe_int(losses),
-        "record": record,
-    }
-
-
-def simplify_live_game(game_dict):
-    """Normaliza um jogo da estrutura do live ScoreBoard()."""
-    home_raw = game_dict.get("homeTeam", {}) or {}
-    away_raw = game_dict.get("awayTeam", {}) or {}
-
-    home = simplify_live_team(home_raw)
-    away = simplify_live_team(away_raw)
-
-    period_raw = game_dict.get("period")
-    if isinstance(period_raw, dict):
-        period = period_raw.get("current") or period_raw.get("period")
-    else:
-        period = period_raw
-
-    return {
-        "game_id": game_dict.get("gameId"),
-        "status": game_dict.get("gameStatus"),
-        "status_text": game_dict.get("gameStatusText") or "",
-        "period": safe_int(period, 0),
-        "clock": game_dict.get("gameClock") or "",
-        "start_time_utc": game_dict.get("gameTimeUTC"),
-        "home": home,
-        "away": away,
-    }
-
-
-def fetch_today_games_from_live():
+def get_live_and_upcoming_games_from_scoreboardv3():
     """
-    Usa nba_api.live ScoreBoard() para devolver:
-      - live_games: em andamento ou concluídos
-      - today_upcoming: agendados para hoje
+    Usa ScoreboardV3 para:
+      - Jogos de HOJE (live + agendados)
+      - Jogos de AMANHÃ (agendados)
+
+    Devolve:
+      live_games, today_upcoming, tomorrow_upcoming, warnings
     """
-    live_games = []
-    today_upcoming = []
     warnings = []
 
-    try:
-        sb = live_scoreboard.ScoreBoard()
-        games = sb.games.get_dict()  # lista de jogos (cada um é um dict)
-        for g in games:
-            simplified = simplify_live_game(g)
-            status = g.get("gameStatus")
-            # 1 = agendado, 2 = live, 3 = final
-            if status == 1:
-                today_upcoming.append(simplified)
-            else:
-                live_games.append(simplified)
-    except Exception as exc:  # noqa: BLE001
-        msg = f"Erro ao obter live scoreboard: {exc}"
-        print(msg)
-        warnings.append(msg)
+    today = datetime.now(timezone.utc).date()
+    tomorrow = today + timedelta(days=1)
 
-    return live_games, today_upcoming, warnings
+    def _simplify_team(team_dict):
+        if not team_dict:
+            return {
+                "team_id": None,
+                "tricode": "",
+                "city": "",
+                "name": "",
+                "score": 0,
+                "wins": None,
+                "losses": None,
+                "record": "",
+            }
+
+        wins = team_dict.get("wins")
+        losses = team_dict.get("losses")
+
+        if wins is not None and losses is not None:
+            record = f"{wins}-{losses}"
+        else:
+            record = ""
+
+        return {
+            "team_id": safe_int(team_dict.get("teamId")),
+            "tricode": team_dict.get("teamTricode") or "",
+            "city": team_dict.get("teamCity") or "",
+            "name": team_dict.get("teamName") or "",
+            "score": safe_int(team_dict.get("score"), default=0),
+            "wins": safe_int(wins),
+            "losses": safe_int(losses),
+            "record": record,
+        }
+
+    def _fetch_day(day):
+        day_str = day.strftime("%Y-%m-%d")
+        try:
+            sb = scoreboardv3.ScoreboardV3(game_date=day_str, league_id="00", timeout=8)
+            data = sb.get_dict()
+            games = data.get("scoreboard", {}).get("games", [])
+        except Exception as e:  # noqa: BLE001
+            msg = f"Erro ao obter ScoreboardV3 para {day_str}: {e}"
+            print(msg)
+            warnings.append(msg)
+            return [], []
+
+        live_list = []
+        upcoming_list = []
+
+        for g in games:
+            status = safe_int(g.get("gameStatus"), default=0)
+            # 1 = agendado, 2 = live, 3 = final
+            if status not in (1, 2):
+                continue
+
+            home = _simplify_team(g.get("homeTeam") or {})
+            away = _simplify_team(g.get("awayTeam") or {})
+
+            period_raw = g.get("period")
+            if isinstance(period_raw, dict):
+                period = period_raw.get("current") or period_raw.get("period")
+            else:
+                period = period_raw
+
+            simple = {
+                "game_id": g.get("gameId"),
+                "status": status,
+                "status_text": g.get("gameStatusText") or "",
+                "start_time_utc": g.get("gameTimeUTC"),
+                "date": day_str,
+                "time_local": g.get("gameTimeLocal") or "",
+                "period": safe_int(period, 0),
+                "clock": g.get("gameClock") or "",
+                "home": home,
+                "away": away,
+            }
+
+            if status == 2:
+                live_list.append(simple)
+            elif status == 1:
+                upcoming_list.append(simple)
+
+        return live_list, upcoming_list
+
+    live_today, today_upcoming = _fetch_day(today)
+    _, tomorrow_upcoming = _fetch_day(tomorrow)
+
+    return live_today, today_upcoming, tomorrow_upcoming, warnings
 
 
 # -----------------------------------------------------------------------------
-# Standings a partir do CSV (sem depender da NBA Stats API)
+# Standings a partir do CSV (sem API ao vivo)
 # -----------------------------------------------------------------------------
 
 def compute_standings_from_csv():
@@ -207,7 +220,7 @@ def compute_standings_from_csv():
 
         for gid, team_rows in games.items():
             if len(team_rows) != 2:
-                # jogos estranhos (não deveriam aparecer aqui)
+                # jogos estranhos (não deviam acontecer)
                 continue
 
             a, b = team_rows
@@ -242,7 +255,7 @@ def compute_standings_from_csv():
             elif home_pts < away_pts:
                 home_result, away_result = "L", "W"
             else:
-                # empate não acontece na NBA; ignorar
+                # empate não existe na NBA; ignorar
                 continue
 
             for row, is_home, result in [
@@ -305,7 +318,6 @@ def compute_standings_from_csv():
             }
             rows_final.append(row)
 
-        # Ordenar por win_pct e vitórias (só para output mais organizado)
         rows_final.sort(
             key=lambda r: (-r["win_pct"], -r["wins"], (r["team"] or ""))
         )
@@ -323,20 +335,11 @@ def compute_standings_from_csv():
 
 @app.route("/")
 def index():
-    """
-    Para uso local: devolve o index.html da raiz.
-    No Vercel, o ficheiro pode ser servido como static file em vez deste route.
-    """
     return send_from_directory(BASE_DIR, "index.html")
 
 
 @app.route("/api/quarters_csv")
 def quarters_csv():
-    """
-    Devolve o CSV tal como está no disco.
-    O frontend espera *texto*, não JSON.
-    Em caso de erro devolvemos JSON com 'error'.
-    """
     if not os.path.exists(CSV_PATH):
         return jsonify({"error": f"CSV não encontrado em {CSV_PATH}"}), 500
 
@@ -350,25 +353,17 @@ def quarters_csv():
 
 @app.route("/api/games")
 def api_games():
-    """
-    Devolve:
-      {
-        ok: true/false,
-        live_games: [...],
-        today_upcoming: [...],
-        tomorrow_upcoming: [],  # por agora vazio
-        warnings: [...],
-        generated_at_utc: "..."
-      }
-    """
-    live_games, today_upcoming, warnings = fetch_today_games_from_live()
-    has_any = bool(live_games or today_upcoming)
+    live_games, today_upcoming, tomorrow_upcoming, warnings = (
+        get_live_and_upcoming_games_from_scoreboardv3()
+    )
+
+    has_any = bool(live_games or today_upcoming or tomorrow_upcoming)
 
     data = {
         "ok": has_any,
         "live_games": live_games,
         "today_upcoming": today_upcoming,
-        "tomorrow_upcoming": [],  # ainda não usamos scoreboardv3 aqui
+        "tomorrow_upcoming": tomorrow_upcoming,
         "warnings": warnings,
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
     }
@@ -378,24 +373,13 @@ def api_games():
 
 @app.route("/api/standings")
 def api_standings():
-    """
-    Devolve standings calculados a partir do CSV:
-      {
-        ok: true/false,
-        rows: [...],
-        warnings: [...]
-      }
-    O frontend faz: standingsApiData = data.rows || [];
-    """
     rows, warnings = compute_standings_from_csv()
     ok = bool(rows)
-
     return jsonify({"ok": ok, "rows": rows, "warnings": warnings})
 
 
 @app.route("/api/health")
 def api_health():
-    """Endpoint simples para testar se o backend está operacional."""
     return jsonify(
         {
             "ok": True,
@@ -405,12 +389,5 @@ def api_health():
     )
 
 
-# -----------------------------------------------------------------------------
-# Execução local
-# -----------------------------------------------------------------------------
-
 if __name__ == "__main__":
-    # Para testes no teu PC:
-    #   python app.py
-    #   e depois abre http://127.0.0.1:5000
     app.run(host="0.0.0.0", port=5000, debug=True)
