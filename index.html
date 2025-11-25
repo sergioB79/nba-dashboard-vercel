@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
-  <title>NBA-EdgeFinder | O motor preditivo da NBA que transforma stats brutas em lucro frio e calculado.</title>
+  <title>NHL-EdgeFinder | O motor preditivo da NHL que transforma stats brutas em lucro frio e calculado.</title>
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -545,8 +545,8 @@
 <body>
   <!-- ECRA DE ARRANQUE / LOADING -->
   <div id="init-screen">
-    <h1>NBA-EdgeFinder</h1>
-    <div id="init-tagline" class="pill">O motor preditivo da NBA que transforma stats brutas em lucro frio e calculado.</div>
+    <h1>NHL-EdgeFinder</h1>
+    <div id="init-tagline" class="pill">O motor preditivo da NHL que transforma stats brutas em lucro frio e calculado.</div>
     <div id="init-quote">
       <p>Todo apostador olha para o marcador.</p>
       <p>Os vencedores olham para o padrão por trás do marcador.</p>
@@ -569,8 +569,8 @@
   <div id="app" class="hidden">
     <div class="app-header">
       <div class="brand-block">
-        <h1>NBA-EdgeFinder</h1>
-        <div class="brand-tagline">O motor preditivo da NBA que transforma stats brutas em lucro frio e calculado.</div>
+        <h1>NHL-EdgeFinder</h1>
+        <div class="brand-tagline">O motor preditivo da NHL que transforma stats brutas em lucro frio e calculado.</div>
         <div class="sub">Época 2025-26 • Dados locais + live API</div>
       </div>
       <div class="header-quote">
@@ -591,7 +591,7 @@
     <div id="tab-games" class="tab-content">
       <p class="info">
         Jogos de hoje em tempo real e próximos jogos (hoje ainda por começar + amanhã),
-        carregados da API oficial da NBA via <code>nba_api</code>.
+        carregados da API oficial da NHL.
       </p>
 
       <div id="games-error" class="error hidden"></div>
@@ -719,36 +719,38 @@
   <script>
     const CSV_ENDPOINT = "/api/quarters_csv";
     const ARENAS_BY_TEAM = {
-      "ATL": "State Farm Arena (Atlanta)",
+      "ANA": "Honda Center (Anaheim)",
+      "ARI": "Mullett Arena (Tempe)",
       "BOS": "TD Garden (Boston)",
-      "BKN": "Barclays Center (Brooklyn)",
-      "CHA": "Spectrum Center (Charlotte)",
+      "BUF": "KeyBank Center (Buffalo)",
+      "CGY": "Scotiabank Saddledome (Calgary)",
+      "CAR": "PNC Arena (Raleigh)",
       "CHI": "United Center (Chicago)",
-      "CLE": "Rocket Mortgage FieldHouse (Cleveland)",
+      "COL": "Ball Arena (Denver)",
+      "CBJ": "Nationwide Arena (Columbus)",
       "DAL": "American Airlines Center (Dallas)",
-      "DEN": "Ball Arena (Denver)",
       "DET": "Little Caesars Arena (Detroit)",
-      "GSW": "Chase Center (San Francisco)",
-      "HOU": "Toyota Center (Houston)",
-      "IND": "Gainbridge Fieldhouse (Indianapolis)",
-      "LAC": "Intuit Dome (Los Angeles)",
-      "LAL": "Crypto.com Arena (Los Angeles)",
-      "MEM": "FedExForum (Memphis)",
-      "MIA": "Kaseya Center (Miami)",
-      "MIL": "Fiserv Forum (Milwaukee)",
-      "MIN": "Target Center (Minneapolis)",
-      "NOP": "Smoothie King Center (New Orleans)",
-      "NYK": "Madison Square Garden (New York)",
-      "OKC": "Paycom Center (Oklahoma City)",
-      "ORL": "Kia Center (Orlando)",
+      "EDM": "Rogers Place (Edmonton)",
+      "FLA": "Amerant Bank Arena (Sunrise)",
+      "LAK": "Crypto.com Arena (Los Angeles)",
+      "MIN": "Xcel Energy Center (Saint Paul)",
+      "MTL": "Bell Centre (Montreal)",
+      "NSH": "Bridgestone Arena (Nashville)",
+      "NJD": "Prudential Center (Newark)",
+      "NYI": "UBS Arena (Elmont)",
+      "NYR": "Madison Square Garden (New York)",
+      "OTT": "Canadian Tire Centre (Ottawa)",
       "PHI": "Wells Fargo Center (Philadelphia)",
-      "PHX": "Footprint Center (Phoenix)",
-      "POR": "Moda Center (Portland)",
-      "SAC": "Golden 1 Center (Sacramento)",
-      "SAS": "Frost Bank Center (San Antonio)",
+      "PIT": "PPG Paints Arena (Pittsburgh)",
+      "SEA": "Climate Pledge Arena (Seattle)",
+      "SJS": "SAP Center (San Jose)",
+      "STL": "Enterprise Center (St. Louis)",
+      "TBL": "Amalie Arena (Tampa)",
       "TOR": "Scotiabank Arena (Toronto)",
-      "UTA": "Delta Center (Salt Lake City)",
-      "WAS": "Capital One Arena (Washington)",
+      "VAN": "Rogers Arena (Vancouver)",
+      "VGK": "T-Mobile Arena (Las Vegas)",
+      "WSH": "Capital One Arena (Washington)",
+      "WPG": "Canada Life Centre (Winnipeg)",
     };
 
     const initScreen = document.getElementById("init-screen");

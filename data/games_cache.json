@@ -1,261 +1,78 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "20240001",
+      "status": 2,
+      "status_text": "2nd Period",
+      "period": 2,
+      "clock": "12:34",
+      "start_time_utc": "2024-10-01T23:00:00Z",
+      "home": {
+        "teamId": 6,
+        "teamTricode": "BOS",
+        "teamName": "Bruins",
+        "teamCity": "Boston",
+        "wins": 4,
+        "losses": 1,
+        "score": 3,
+        "tricode": "BOS",
+        "name": "Bruins",
+        "city": "Boston",
+        "record": "4-1"
+      },
+      "away": {
+        "teamId": 10,
+        "teamTricode": "TOR",
+        "teamName": "Maple Leafs",
+        "teamCity": "Toronto",
+        "wins": 3,
+        "losses": 2,
+        "score": 2,
+        "tricode": "TOR",
+        "name": "Maple Leafs",
+        "city": "Toronto",
+        "record": "3-2"
+      }
+    }
+  ],
   "today_upcoming": [
     {
-      "game_id": "0022500057",
+      "game_id": "20240002",
       "status": 1,
       "status_text": "7:00 pm ET",
       "period": 0,
       "clock": "",
-      "start_time_utc": "2025-11-26T00:00:00Z",
+      "start_time_utc": "2024-10-02T23:00:00Z",
       "home": {
-        "teamId": 1610612764,
-        "teamTricode": "WAS",
-        "teamName": "Wizards",
-        "teamCity": "Washington",
-        "wins": 1,
-        "losses": 15,
+        "teamId": 17,
+        "teamTricode": "DET",
+        "teamName": "Red Wings",
+        "teamCity": "Detroit",
+        "wins": 2,
+        "losses": 3,
         "score": 0,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 0
-          }
-        ],
-        "tricode": "WAS",
-        "name": "Wizards",
-        "city": "Washington",
-        "record": "1-15"
+        "tricode": "DET",
+        "name": "Red Wings",
+        "city": "Detroit",
+        "record": "2-3"
       },
       "away": {
-        "teamId": 1610612737,
-        "teamTricode": "ATL",
-        "teamName": "Hawks",
-        "teamCity": "Atlanta",
-        "wins": 11,
-        "losses": 7,
+        "teamId": 16,
+        "teamTricode": "CHI",
+        "teamName": "Blackhawks",
+        "teamCity": "Chicago",
+        "wins": 2,
+        "losses": 3,
         "score": 0,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 0
-          }
-        ],
-        "tricode": "ATL",
-        "name": "Hawks",
-        "city": "Atlanta",
-        "record": "11-7"
-      }
-    },
-    {
-      "game_id": "0022500058",
-      "status": 1,
-      "status_text": "8:00 pm ET",
-      "period": 0,
-      "clock": "",
-      "start_time_utc": "2025-11-26T01:00:00Z",
-      "home": {
-        "teamId": 1610612755,
-        "teamTricode": "PHI",
-        "teamName": "76ers",
-        "teamCity": "Philadelphia",
-        "wins": 9,
-        "losses": 7,
-        "score": 0,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 0
-          }
-        ],
-        "tricode": "PHI",
-        "name": "76ers",
-        "city": "Philadelphia",
-        "record": "9-7"
-      },
-      "away": {
-        "teamId": 1610612753,
-        "teamTricode": "ORL",
-        "teamName": "Magic",
-        "teamCity": "Orlando",
-        "wins": 10,
-        "losses": 8,
-        "score": 0,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 0
-          }
-        ],
-        "tricode": "ORL",
-        "name": "Magic",
-        "city": "Orlando",
-        "record": "10-8"
-      }
-    },
-    {
-      "game_id": "0022500059",
-      "status": 1,
-      "status_text": "11:00 pm ET",
-      "period": 0,
-      "clock": "",
-      "start_time_utc": "2025-11-26T04:00:00Z",
-      "home": {
-        "teamId": 1610612747,
-        "teamTricode": "LAL",
-        "teamName": "Lakers",
-        "teamCity": "Los Angeles",
-        "wins": 12,
-        "losses": 4,
-        "score": 0,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 0
-          }
-        ],
-        "tricode": "LAL",
-        "name": "Lakers",
-        "city": "Los Angeles",
-        "record": "12-4"
-      },
-      "away": {
-        "teamId": 1610612746,
-        "teamTricode": "LAC",
-        "teamName": "Clippers",
-        "teamCity": "LA",
-        "wins": 5,
-        "losses": 12,
-        "score": 0,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 0
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 0
-          }
-        ],
-        "tricode": "LAC",
-        "name": "Clippers",
-        "city": "LA",
-        "record": "5-12"
+        "tricode": "CHI",
+        "name": "Blackhawks",
+        "city": "Chicago",
+        "record": "2-3"
       }
     }
   ],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2025-11-25T17:11:41.872804+00:00"
+  "generated_at_utc": "2025-11-25T19:30:00Z"
 }

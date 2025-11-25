@@ -1,340 +1,170 @@
 """
-getQuarters.py (versão com GAME_ID normalizado + update incremental limpo)
+getQuarters.py (NHL)
 
-- Cria / atualiza um ficheiro CSV com TODOS os jogos da época 2025-26 (Regular Season),
-  com pontos por período (Q1..Q4) e total de OT (OT) por equipa, usando ScoreboardV3.
-- Normaliza sempre GAME_ID para 10 dígitos com zeros à esquerda (ex: 0022500001).
-- Se o ficheiro já existir, só chama a API para os jogos que ainda não estão no CSV.
-- No fim, mantém apenas os GAME_ID que aparecem no LeagueGameLog dessa época (limpa lixo).
+Cria/atualiza um ficheiro CSV com estatísticas por jogo/equipa
+usando o endpoint oficial da NHL (`statsapi.web.nhl.com`).
+
+Inclui golos por período (P1, P2, P3, OT) e métricas básicas
+como remates e power-play.
 """
 
 import os
-import time
-from typing import Dict, List, Optional, Set
+from datetime import date, datetime, timedelta
+from typing import Dict, List
 
 import pandas as pd
-from nba_api.stats.endpoints import leaguegamelog, scoreboardv3
+import requests
+
+SEASON_ID = "20242025"
+SEASON_TYPE = "Regular"
+START_DATE = date(2024, 10, 1)
+OUTPUT_FILE = os.path.join("data", f"nhl_periods_{SEASON_ID}.csv")
+
+SCHEDULE_URL = "https://statsapi.web.nhl.com/api/v1/schedule"
+TEAM_URL = "https://statsapi.web.nhl.com/api/v1/teams"
 
 
-SEASON = "2025-26"               # época atual
-SEASON_TYPE = "Regular Season"   # ou "Playoffs"
-# grava diretamente dentro de data/
-OUTPUT_FILE = os.path.join("data", f"nba_quarters_{SEASON.replace('-', '')}.csv")
-SLEEP_SECONDS = 0.8              # pausa entre chamadas à API (ajusta se precisares)
-
-
-# ==============================
-#  HELPERS
-# ==============================
-
-def normalize_game_id(x) -> str:
-    """
-    Converte GAME_ID para string com 10 dígitos, com zeros à esquerda se necessário.
-    Ex.: 22500001 -> '0022500001'
-    """
-    if pd.isna(x):
-        return ""
-    s = str(x).strip()
-    # remover possíveis ".0" vindos de float
-    if s.endswith(".0"):
-        s = s[:-2]
-    return s.zfill(10)
-
-
-def load_existing_output(path: str) -> Optional[pd.DataFrame]:
-    """
-    Lê o CSV existente (se houver). Se não existir, devolve None.
-    """
-    if not os.path.exists(path):
-        print("ℹ️ Ficheiro de saída ainda não existe. Vai ser criado de raiz.")
-        return None
-
+def fetch_team_map() -> Dict[int, Dict[str, str]]:
     try:
-        df = pd.read_csv(path)
-        print(f"📂 Ficheiro existente encontrado: {path} (linhas: {len(df)})")
-        return df
-    except Exception as e:
-        print(f"⚠️ Erro a ler ficheiro existente ({path}): {e}")
-        print("   Vai ser ignorado e recriado de raiz.")
-        return None
+        r = requests.get(TEAM_URL, timeout=10)
+        r.raise_for_status()
+        teams = r.json().get("teams", [])
+    except Exception as exc:  # noqa: BLE001
+        print("❌ Falha ao obter equipas NHL:", exc)
+        return {}
+
+    mapping = {}
+    for t in teams:
+        mapping[t.get("id")] = {
+            "abbr": t.get("abbreviation") or (t.get("teamName", "")[:3].upper()),
+            "name": t.get("teamName"),
+            "full": t.get("name"),
+        }
+    return mapping
 
 
-def get_existing_game_ids(df: Optional[pd.DataFrame]) -> Set[str]:
-    """
-    Extrai o conjunto de GAME_ID já presentes no CSV.
-    """
-    if df is None or df.empty:
-        return set()
-    # garantir que estão normalizados
-    return set(df["GAME_ID"].astype(str).apply(normalize_game_id).unique())
+def fetch_schedule(start: date, end: date) -> List[Dict]:
+    params = {
+        "startDate": start.isoformat(),
+        "endDate": end.isoformat(),
+    }
+    r = requests.get(SCHEDULE_URL, params=params, timeout=15)
+    r.raise_for_status()
+    return r.json().get("dates", [])
 
 
-def get_season_games(season: str, season_type: str) -> pd.DataFrame:
-    """
-    Vai ao LeagueGameLog buscar TODOS os jogos (home e away) dessa época e tipo de época.
-
-    Devolve DataFrame com colunas importantes: GAME_ID, GAME_DATE, MATCHUP, TEAM_ID, PTS, etc.
-    """
-    lg = leaguegamelog.LeagueGameLog(
-        league_id="00",
-        season=season,
-        season_type_all_star=season_type,
-        counter=0,
-        direction="ASC",
-        player_or_team="T",  # T -> Team
-        sorter="DATE"
-    )
-    df = lg.get_data_frames()[0]
-
-    # Converter GAME_DATE para datetime e criar coluna de "dia" (yyyy-mm-dd)
-    df["GAME_DATE"] = pd.to_datetime(df["GAME_DATE"])
-    df["GAME_DAY"] = df["GAME_DATE"].dt.floor("D")
-
-    # Normalizar GAME_ID aqui para já vir limpo
-    df["GAME_ID"] = df["GAME_ID"].apply(normalize_game_id)
-
-    print(f"✅ LeagueGameLog devolveu {len(df)} linhas (equipa/jogo).")
-    return df
+def fetch_game_feed(game_pk: int) -> Dict:
+    url = f"https://statsapi.web.nhl.com/api/v1/game/{game_pk}/feed/live"
+    r = requests.get(url, timeout=15)
+    r.raise_for_status()
+    return r.json()
 
 
-def fetch_day_from_scoreboard(day: pd.Timestamp) -> List[Dict]:
-    """
-    Vai ao ScoreboardV3 para um determinado dia (yyyy-mm-dd) e devolve
-    uma lista de dicts com estatísticas por equipa/jogo:
-
-    [
-      {
-        "GAME_ID": "0022500001",
-        "TEAM_ID": 1610612737,
-        "TEAM_ABBREVIATION": "ATL",
-        "TEAM_NAME": "Atlanta Hawks",
-        "MATCHUP": "ATL @ BOS",
-        "Q1": 25,
-        "Q2": 31,
-        "Q3": 22,
-        "Q4": 27,
-        "OT": 10,
-        "PTS": 115,
-      },
-      ...
-    ]
-    """
-    date_str = day.strftime("%Y-%m-%d")
-    sb = scoreboardv3.ScoreboardV3(game_date=date_str, league_id="00", day_offset=0)
-    games = sb.get_data_frames()
-
-    # scoreboardv3 devolve vários DataFrames; o que nos interessa é o "LineScore"
-    # mas, na versão atual da nba_api, ele costuma vir como o segundo DataFrame.
-    if len(games) < 2:
-        print(f"⚠️ ScoreboardV3({date_str}) não devolveu LineScore esperado.")
-        return []
-
-    # Tentamos identificar o DF que tenha colunas "GAME_ID", "TEAM_ID" etc.
-    linescore_df = None
-    for df in games:
-        if {"GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION", "TEAM_NAME"}.issubset(df.columns):
-            linescore_df = df
-            break
-
-    if linescore_df is None or linescore_df.empty:
-        print(f"⚠️ ScoreboardV3({date_str}) não tem LineScore com as colunas esperadas.")
-        return []
-
-    # Alguns ScoreboardV3 já trazem Q1, Q2, Q3, Q4, OT, PTS
-    cols_needed = ["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION", "TEAM_NAME", "PTS"]
-    quarter_cols = ["PTS_QTR1", "PTS_QTR2", "PTS_QTR3", "PTS_QTR4"]
-
-    for c in cols_needed + quarter_cols:
-        if c not in linescore_df.columns:
-            print(f"⚠️ Coluna {c} em falta em LineScore({date_str}).")
-            return []
-
-    rows = []
-    for _, row in linescore_df.iterrows():
-        game_id = normalize_game_id(row["GAME_ID"])
-        team_id = int(row["TEAM_ID"])
-        team_abbr = str(row["TEAM_ABBREVIATION"])
-        team_name = str(row["TEAM_NAME"])
-
-        q1 = int(row["PTS_QTR1"])
-        q2 = int(row["PTS_QTR2"])
-        q3 = int(row["PTS_QTR3"])
-        q4 = int(row["PTS_QTR4"])
-        pts_total = int(row["PTS"])
-
-        ot = pts_total - (q1 + q2 + q3 + q4)
-
-        rows.append(
-            {
-                "GAME_ID": game_id,
-                "TEAM_ID": team_id,
-                "TEAM_ABBREVIATION": team_abbr,
-                "TEAM_NAME": team_name,
-                "Q1": q1,
-                "Q2": q2,
-                "Q3": q3,
-                "Q4": q4,
-                "OT": ot,
-                "PTS": pts_total,
-            }
-        )
-
-    return rows
-
-
-def cleanup_and_write(df: pd.DataFrame, games_df: pd.DataFrame) -> None:
-    """
-    Limpa / normaliza o DataFrame final e grava no OUTPUT_FILE:
-
-    - Normaliza GAME_ID.
-    - Remove linhas com GAME_ID que não existam no LeagueGameLog dessa época.
-    - Garante tipos numéricos em Q1..Q4, OT, PTS.
-    - Ordena por GAME_DATE + TEAM_ABBREVIATION.
-    """
-    print("🧹 A limpar e normalizar DataFrame final...")
-
-    df = df.copy()
-
-    # Normalizar GAME_ID
-    df["GAME_ID"] = df["GAME_ID"].apply(normalize_game_id)
-
-    # Lista de GAME_ID válidos (que existem no LeagueGameLog da época)
-    valid_ids = set(games_df["GAME_ID"].astype(str).apply(normalize_game_id).unique())
-    before = len(df)
-    df = df[df["GAME_ID"].isin(valid_ids)].copy()
-    after = len(df)
-    print(f"   Removidas {before - after} linhas com GAME_ID fora da época {SEASON}.")
-
-    # Converter Q1..Q4, OT, PTS para numérico
-    for col in ["Q1", "Q2", "Q3", "Q4", "OT", "PTS"]:
-        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
-
-    # Unir com meta de jogos (GAME_DATE, MATCHUP) vindas de games_df
-    meta = (
-        games_df[["GAME_ID", "GAME_DATE", "MATCHUP"]]
-        .drop_duplicates("GAME_ID")
-        .copy()
-    )
-    meta["GAME_ID"] = meta["GAME_ID"].apply(normalize_game_id)
-
-    df = df.merge(meta, on="GAME_ID", how="left")
-
-    # Ordenar por GAME_DATE, GAME_ID, TEAM_ABBREVIATION
-    df.sort_values(["GAME_DATE", "GAME_ID", "TEAM_ABBREVIATION"], inplace=True)
-
-    print(f"💾 A gravar ficheiro final: {OUTPUT_FILE} (linhas: {len(df)})")
-    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
-    df.to_csv(OUTPUT_FILE, index=False, encoding="utf-8")
-
-
-# ==============================
-#  MAIN
-# ==============================
-
-def main():
-    # 1) Ler ficheiro existente (se houver)
-    existing_df = load_existing_output(OUTPUT_FILE)
-    if existing_df is not None and not existing_df.empty:
-        # Normalizar GAME_ID imediatamente
-        existing_df["GAME_ID"] = existing_df["GAME_ID"].apply(normalize_game_id)
-
-    # 2) Jogos da época (todos) via LeagueGameLog
-    try:
-        games_df = get_season_games(SEASON, SEASON_TYPE)
-    except Exception as exc:
-        # Não deixamos o script rebentar se a API da NBA estiver lenta/offline.
-        print("⚠️ Não foi possível obter LeagueGameLog da stats.nba.com:")
-        print(f"   {exc}")
-        print("⚠️ A atualização será tentada novamente na próxima execução.")
-        return
-
-    if games_df.empty:
-        print("❌ LeagueGameLog devolveu vazio. Nada para fazer.")
-        return
-
-    all_game_ids = set(games_df["GAME_ID"].astype(str).unique())
-
-    # 3) Quais são os jogos já existentes no CSV?
-    existing_ids = get_existing_game_ids(existing_df)
-
-    # 4) Quais são os jogos em falta?
-    missing_ids = all_game_ids - existing_ids
-    print(f"🔍 Jogos em falta nesta época (ainda não no CSV): {len(missing_ids)}")
-
-    # 5) Se não há jogos em falta, ainda assim limpamos/normalizamos e regravamos
-    if len(missing_ids) == 0:
-        if existing_df is None or existing_df.empty:
-            print("❌ Não há ficheiro existente e não há missing_ids (situação estranha).")
-            return
-        print("✅ Não há jogos novos para adicionar. A limpar/normalizar ficheiro existente...")
-        cleanup_and_write(existing_df, games_df)
-        return
-
-    # 6) Restringir o DataFrame de jogos apenas aos missing_ids
-    games_missing_df = games_df[games_df["GAME_ID"].astype(str).isin(missing_ids)].copy()
-
-    # Mapa rápido GAME_ID -> (GAME_DATE, MATCHUP)
-    game_meta = (
-        games_df[["GAME_ID", "GAME_DATE", "MATCHUP"]]
-        .drop_duplicates("GAME_ID")
-        .set_index("GAME_ID")
-        .to_dict(orient="index")
-    )
-
-    # Lista de dias com jogos em falta
-    days = sorted(games_missing_df["GAME_DAY"].unique())
-    print(f"📅 Número de dias com jogos em falta: {len(days)}")
+def build_rows(team_map: Dict[int, Dict[str, str]]) -> pd.DataFrame:
+    today = date.today()
+    schedule = fetch_schedule(START_DATE, today)
 
     all_rows: List[Dict] = []
 
-    for idx, d in enumerate(days, start=1):
-        print(f"[{idx}/{len(days)}] {d} → a ler ScoreboardV3...")
-        day_rows = fetch_day_from_scoreboard(d)
-        if not day_rows:
-            continue
+    for day in schedule:
+        game_date = day.get("date")
+        for g in day.get("games", []):
+            game_pk = g.get("gamePk")
+            matchup = g.get("teams", {})
+            away_info = matchup.get("away", {})
+            home_info = matchup.get("home", {})
 
-        # Enriquecer com GAME_DATE / MATCHUP vindos do LeagueGameLog
-        for r in day_rows:
-            gid = str(r["GAME_ID"])
-            # só queremos guardar se este jogo estiver em missing_ids
-            if gid not in missing_ids:
+            try:
+                feed = fetch_game_feed(game_pk)
+            except Exception as exc:  # noqa: BLE001
+                print(f"⚠️ Falha ao obter boxscore de {game_pk}: {exc}")
                 continue
 
-            meta = game_meta.get(gid)
-            if meta:
-                # meta["GAME_DATE"] é datetime (porque convertida em get_season_games)
-                r["GAME_DATE"] = meta["GAME_DATE"].strftime("%Y-%m-%d")
-                r["MATCHUP"] = meta["MATCHUP"]
-            else:
-                # fallback se algum GAME_ID não estiver em LeagueGameLog
-                r["GAME_DATE"] = d.strftime("%Y-%m-%d")
-                r["MATCHUP"] = ""
+            linescore = feed.get("liveData", {}).get("linescore", {})
+            periods = linescore.get("periods", [])
 
-            r["SEASON"] = SEASON
-            r["SEASON_TYPE"] = SEASON_TYPE
+            def period_goals(side: str, num: int) -> int:
+                for p in periods:
+                    if p.get("num") == num:
+                        return p.get(side, {}).get("goals", 0)
+                return 0
 
-            all_rows.append(r)
+            def ot_goals(side: str) -> int:
+                total = sum(period_goals(side, n) for n in [1, 2, 3])
+                return max(0, linescore.get(side, {}).get("goals", 0) - total)
 
-        time.sleep(SLEEP_SECONDS)
+            box_teams = feed.get("liveData", {}).get("boxscore", {}).get("teams", {})
 
-    if not all_rows:
-        print("❌ Scoreboard não devolveu dados novos para nenhum dia (jogos podem ainda não ter boxscore disponível).")
-        # Mesmo assim limpamos/normalizamos o que já existe
-        if existing_df is not None and not existing_df.empty:
-            cleanup_and_write(existing_df, games_df)
+            def build_team_row(side: str, info: Dict) -> Dict:
+                team = info.get("team", {})
+                tm = team_map.get(team.get("id"), {})
+                stats = box_teams.get(side, {}).get("teamStats", {}).get("teamSkaterStats", {})
+
+                p1 = period_goals(side, 1)
+                p2 = period_goals(side, 2)
+                p3 = period_goals(side, 3)
+                ot = ot_goals(side)
+
+                return {
+                    "GAME_ID": str(game_pk),
+                    "GAME_DATE": game_date,
+                    "MATCHUP": f"{away_team['team'].get('abbreviation', '')} @ {home_team['team'].get('abbreviation', '')}",
+                    "TEAM_ID": team.get("id"),
+                    "TEAM_ABBREVIATION": tm.get("abbr") or team.get("abbreviation"),
+                    "TEAM_NAME": tm.get("name") or team.get("name"),
+                    # períodos NHL
+                    "P1": p1,
+                    "P2": p2,
+                    "P3": p3,
+                    "OT": ot,
+                    # aliases para compatibilidade com UI antiga
+                    "Q1": p1,
+                    "Q2": p2,
+                    "Q3": p3,
+                    "Q4": ot,
+                    "PTS": stats.get("goals", 0),
+                    "GOALS": stats.get("goals", 0),
+                    "SHOTS": stats.get("shots", 0),
+                    "POWER_PLAY_GOALS": stats.get("powerPlayGoals", 0),
+                    "POWER_PLAY_OPPORTUNITIES": stats.get("powerPlayOpportunities", 0),
+                    "PIM": stats.get("pim", 0),
+                    "HITS": stats.get("hits", 0),
+                    "BLOCKED": stats.get("blocked", 0),
+                    "TAKEAWAYS": stats.get("takeaways", 0),
+                    "GIVEAWAYS": stats.get("giveaways", 0),
+                    "SEASON": SEASON_ID,
+                    "SEASON_TYPE": SEASON_TYPE,
+                }
+
+            away_team = matchup.get("away", {})
+            home_team = matchup.get("home", {})
+
+            away_row = build_team_row("away", away_team)
+            home_row = build_team_row("home", home_team)
+
+            all_rows.extend([away_row, home_row])
+
+    df = pd.DataFrame(all_rows)
+    if not df.empty:
+        df.sort_values(["GAME_DATE", "GAME_ID", "TEAM_ABBREVIATION"], inplace=True)
+    return df
+
+
+def main():
+    try:
+        team_map = fetch_team_map()
+        df = build_rows(team_map)
+    except Exception as exc:  # noqa: BLE001
+        print("❌ Erro geral:", exc)
         return
 
-    new_df = pd.DataFrame(all_rows)
-    print(f"➕ Novas linhas obtidas (equipa/jogo): {len(new_df)}")
+    if df.empty:
+        print("⚠️ Sem dados para gravar.")
+        return
 
-    # 7) Juntar com dados antigos (se existirem)
-    if existing_df is not None and not existing_df.empty:
-        full_df = pd.concat([existing_df, new_df], ignore_index=True)
-    else:
-        full_df = new_df
-
-    # 8) Limpar, normalizar e gravar ficheiro final
-    cleanup_and_write(full_df, games_df)
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+    df.to_csv(OUTPUT_FILE, index=False, encoding="utf-8")
+    print(f"✅ Ficheiro atualizado: {OUTPUT_FILE} ({len(df)} linhas)")
 
 
 if __name__ == "__main__":

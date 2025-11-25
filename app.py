@@ -14,20 +14,24 @@ app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# CSV estático com quartos / standings
-CSV_PATH = os.path.join(BASE_DIR, "data", "nba_quarters_202526.csv")
+# CSV estático com períodos / standings (tenta NHL, depois fallback antigo)
+CSV_CANDIDATES = [
+    os.path.join(BASE_DIR, "data", "nhl_periods_20242025.csv"),
+    os.path.join(BASE_DIR, "data", "nba_quarters_202526.csv"),
+]
 
 # JSON estático com jogos (criado pelo getGames.py via GitHub Actions)
 GAMES_JSON_PATH = os.path.join(BASE_DIR, "data", "games_cache.json")
 
 # Conferência por equipa (tricode)
 CONF_BY_TRICODE = {
-    "ATL": "East", "BOS": "East", "BKN": "East", "CHA": "East", "CHI": "East",
-    "CLE": "East", "DET": "East", "IND": "East", "MIA": "East", "MIL": "East",
-    "NYK": "East", "ORL": "East", "PHI": "East", "TOR": "East", "WAS": "East",
-    "DAL": "West", "DEN": "West", "GSW": "West", "HOU": "West", "LAC": "West",
-    "LAL": "West", "MEM": "West", "MIN": "West", "NOP": "West", "OKC": "West",
-    "PHX": "West", "POR": "West", "SAC": "West", "SAS": "West", "UTA": "West",
+    "BOS": "East", "BUF": "East", "DET": "East", "FLA": "East", "MTL": "East",
+    "OTT": "East", "TBL": "East", "TOR": "East", "CAR": "East", "CBJ": "East",
+    "NJD": "East", "NYI": "East", "NYR": "East", "PHI": "East", "PIT": "East",
+    "WSH": "East", "ARI": "West", "CGY": "West", "CHI": "West", "COL": "West",
+    "DAL": "West", "EDM": "West", "LAK": "West", "MIN": "West", "NSH": "West",
+    "SJS": "West", "SEA": "West", "STL": "West", "VAN": "West", "VGK": "West",
+    "WPG": "West", "ANA": "West",
 }
 
 # -----------------------------------------------------------------------------
@@ -62,20 +66,35 @@ def compute_streak(results):
 # Standings a partir do CSV (sem API ao vivo)
 # -----------------------------------------------------------------------------
 
+
+def select_csv_path():
+    for idx, path in enumerate(CSV_CANDIDATES):
+        if os.path.exists(path):
+            warn = []
+            if idx > 0:
+                warn.append(
+                    "CSV NHL não encontrado; a usar ficheiro de legado "
+                    f"({os.path.basename(path)})."
+                )
+            return path, warn
+    primary = CSV_CANDIDATES[0]
+    return primary, [f"CSV não encontrado em {primary}"]
+
+
 def compute_standings_from_csv():
-    """
-    Lê o ficheiro nba_quarters_202526.csv e calcula standings por equipa.
-    """
+    """Calcula standings a partir do CSV disponível (NHL se existir)."""
     warnings = []
     rows_final = []
 
-    if not os.path.exists(CSV_PATH):
-        warnings.append(f"CSV não encontrado em {CSV_PATH}")
+    csv_path, selection_warnings = select_csv_path()
+    warnings.extend(selection_warnings)
+
+    if selection_warnings:
         return rows_final, warnings
 
     try:
         games = collections.defaultdict(list)
-        with open(CSV_PATH, encoding="utf-8-sig") as f:
+        with open(csv_path, encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             for row in reader:
                 gid = row.get("GAME_ID")
@@ -132,8 +151,8 @@ def compute_standings_from_csv():
             away_row = rows_by_code.get(away_code) or b
 
             try:
-                home_pts = int(home_row.get("PTS") or 0)
-                away_pts = int(away_row.get("PTS") or 0)
+                home_pts = int(home_row.get("GOALS") or 0)
+                away_pts = int(away_row.get("GOALS") or 0)
             except ValueError:
                 continue
 
@@ -225,11 +244,13 @@ def index():
 
 @app.route("/api/quarters_csv")
 def quarters_csv():
-    if not os.path.exists(CSV_PATH):
-        return jsonify({"error": f"CSV não encontrado em {CSV_PATH}"}), 500
+    csv_path, selection_warnings = select_csv_path()
+
+    if selection_warnings:
+        return jsonify({"error": selection_warnings[0]}), 500
 
     try:
-        with open(CSV_PATH, "r", encoding="utf-8") as f:
+        with open(csv_path, "r", encoding="utf-8") as f:
             csv_text = f.read()
         return Response(csv_text, mimetype="text/csv")
     except Exception as exc:  # noqa: BLE001
@@ -274,7 +295,7 @@ def api_health():
     return jsonify(
         {
             "ok": True,
-            "message": "NBA backend a funcionar",
+            "message": "NHL backend a funcionar",
             "time_utc": datetime.now(timezone.utc).isoformat(),
         }
     )

@@ -1,128 +1,164 @@
 """
-getGames.py
+getGames.py (versão NHL)
 
-Vai buscar os jogos de HOJE à API oficial JSON da NBA
-(cdn.nba.com) e grava em data/games_cache.json.
+Vai buscar o calendário de HOJE e AMANHÃ da NHL
+(`statsapi.web.nhl.com`) e grava em data/games_cache.json.
 
-Forma os campos home/away com *dois conjuntos* de chaves:
-- as originais da NBA (teamTricode, teamName, teamCity, wins, losses, score)
-- aliases simples usados pelo frontend (tricode, name, city)
-
-Assim o frontend antigo continua a funcionar sem mexer no JS.
+Os blocos home/away mantêm chaves simples (tricode, name, city, wins, losses, score)
+para que o frontend possa reutilizar o mesmo contrato.
 """
 
 import os
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from typing import Dict, Tuple
 
 import requests
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_FILE = os.path.join(BASE_DIR, "data", "games_cache.json")
 
-NBA_URL = "https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
+SCHEDULE_URL = "https://statsapi.web.nhl.com/api/v1/schedule"
+TEAMS_URL = "https://statsapi.web.nhl.com/api/v1/teams"
 
 
-def build_team(team_raw: dict) -> dict:
-    """
-    Converte o bloco homeTeam/awayTeam da NBA num dicionário
-    com:
-      - chaves originais: teamId, teamTricode, teamName, teamCity, wins, losses, score
-      - aliases: tricode, name, city
-    """
-    if team_raw is None:
-        team_raw = {}
+def get_team_map() -> Dict[int, Dict[str, str]]:
+    try:
+        r = requests.get(TEAMS_URL, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+        teams = data.get("teams", [])
+    except Exception as exc:  # noqa: BLE001
+        print("❌ Erro ao obter lista de equipas NHL:", exc)
+        return {}
 
-    team_tricode = team_raw.get("teamTricode")
-    team_name = team_raw.get("teamName")
-    team_city = team_raw.get("teamCity")
-    wins = team_raw.get("wins")
-    losses = team_raw.get("losses")
+    mapping = {}
+    for t in teams:
+        tid = t.get("id")
+        mapping[tid] = {
+            "tricode": t.get("abbreviation") or (t.get("teamName", "")[:3].upper()),
+            "name": t.get("teamName"),
+            "city": t.get("locationName"),
+            "full": t.get("name"),
+        }
+    return mapping
 
-    # record tipo "15-3"
-    if wins is not None and losses is not None:
-        record = f"{wins}-{losses}"
-    else:
-        record = ""
+
+def build_team(team_raw: dict, team_map: Dict[int, Dict[str, str]]) -> dict:
+    info = team_map.get(team_raw.get("id"), {})
+    record = team_raw.get("leagueRecord", {})
+    wins = record.get("wins")
+    losses = record.get("losses")
 
     return {
-        # campos originais
-        "teamId": team_raw.get("teamId"),
-        "teamTricode": team_tricode,
-        "teamName": team_name,
-        "teamCity": team_city,
+        "teamId": team_raw.get("id"),
+        "teamTricode": info.get("tricode"),
+        "teamName": info.get("name") or team_raw.get("name"),
+        "teamCity": info.get("city"),
         "wins": wins,
         "losses": losses,
         "score": team_raw.get("score"),
-        "seed": team_raw.get("seed"),
-        "inBonus": team_raw.get("inBonus"),
-        "timeoutsRemaining": team_raw.get("timeoutsRemaining"),
-        "periods": team_raw.get("periods", []),
 
-        # aliases para o frontend antigo
-        "tricode": team_tricode,
-        "name": team_name,
-        "city": team_city,
-        "record": record,
+        "tricode": info.get("tricode"),
+        "name": info.get("name") or team_raw.get("name"),
+        "city": info.get("city"),
+        "record": f"{wins}-{losses}" if wins is not None and losses is not None else "",
     }
+
+
+def fetch_linescore(game_pk: int) -> Tuple[int, str]:
+    url = f"https://statsapi.web.nhl.com/api/v1/game/{game_pk}/linescore"
+    try:
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+        period = data.get("currentPeriod")
+        clock = data.get("currentPeriodTimeRemaining")
+        return period, clock
+    except Exception:
+        return None, None
+
+
+def fetch_games_for_date(date_str: str, team_map: Dict[int, Dict[str, str]]):
+    params = {"date": date_str}
+    try:
+        r = requests.get(SCHEDULE_URL, params=params, timeout=10)
+        r.raise_for_status()
+        data = r.json()
+    except Exception as e:  # noqa: BLE001
+        print(f"❌ Erro ao obter jogos da NHL ({date_str}):", e)
+        return []
+
+    dates = data.get("dates", [])
+    if not dates:
+        return []
+
+    games_raw = dates[0].get("games", [])
+    games_list = []
+
+    for g in games_raw:
+        status_code = g.get("status", {}).get("statusCode", "0")
+        detailed = g.get("status", {}).get("detailedState")
+        start_time = g.get("gameDate")
+        game_pk = g.get("gamePk")
+
+        # NHL status codes: 1/2/3 pre, 4 live, 5 final, 6 future etc
+        if status_code in {"1", "2"}:
+            status = 1  # scheduled
+        elif status_code in {"3", "4"}:
+            status = 2  # live
+        else:
+            status = 3  # final/other
+
+        home_raw = g.get("teams", {}).get("home", {}).get("team", {}) | {
+            "score": g.get("teams", {}).get("home", {}).get("score"),
+            "leagueRecord": g.get("teams", {}).get("home", {}).get("leagueRecord", {}),
+        }
+        away_raw = g.get("teams", {}).get("away", {}).get("team", {}) | {
+            "score": g.get("teams", {}).get("away", {}).get("score"),
+            "leagueRecord": g.get("teams", {}).get("away", {}).get("leagueRecord", {}),
+        }
+
+        period, clock = fetch_linescore(game_pk)
+
+        games_list.append(
+            {
+                "game_id": str(game_pk),
+                "status": status,
+                "status_text": detailed,
+                "period": period,
+                "clock": clock,
+                "start_time_utc": start_time,
+                "home": build_team(home_raw, team_map),
+                "away": build_team(away_raw, team_map),
+            }
+        )
+
+    return games_list
 
 
 def fetch_games():
     now_iso = datetime.now(timezone.utc).isoformat()
+    team_map = get_team_map()
 
-    try:
-        r = requests.get(NBA_URL, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-    except Exception as e:  # noqa: BLE001
-        print("❌ Erro ao obter jogos da NBA:", e)
-        return {
-            "ok": False,
-            "live_games": [],
-            "today_upcoming": [],
-            "tomorrow_upcoming": [],
-            "warnings": [f"Erro ao obter jogos: {e}"],
-            "generated_at_utc": now_iso,
-        }
+    today = datetime.now(timezone.utc).date()
+    tomorrow = today + timedelta(days=1)
 
-    games = data.get("scoreboard", {}).get("games", [])
+    today_str = today.isoformat()
+    tomorrow_str = tomorrow.isoformat()
 
-    live = []
-    upcoming = []
+    today_games = fetch_games_for_date(today_str, team_map)
+    tomorrow_games = fetch_games_for_date(tomorrow_str, team_map)
 
-    for g in games:
-        status = g.get("gameStatus", 0)
-
-        home = build_team(g.get("homeTeam"))
-        away = build_team(g.get("awayTeam"))
-
-        simple = {
-            "game_id": g.get("gameId"),
-            "status": status,
-            "status_text": g.get("gameStatusText"),
-            "period": g.get("period"),
-            "clock": g.get("gameClock"),
-            "start_time_utc": g.get("gameTimeUTC"),
-            "home": home,
-            "away": away,
-        }
-
-        # 1 = agendado, 2 = live, 3 = final
-        if status == 2:
-            # jogos em directo
-            live.append(simple)
-        elif status == 1:
-            # só jogos agendados vão para "upcoming"
-            upcoming.append(simple)
-        else:
-            # status 3 (Final) e outros: ignoramos nesta lista
-            continue
+    live = [g for g in today_games if g.get("status") == 2]
+    today_upcoming = [g for g in today_games if g.get("status") == 1]
+    tomorrow_upcoming = [g for g in tomorrow_games if g.get("status") == 1]
 
     return {
         "ok": True,
         "live_games": live,
-        "today_upcoming": upcoming,
-        "tomorrow_upcoming": [],  # este endpoint só dá o dia de hoje
+        "today_upcoming": today_upcoming,
+        "tomorrow_upcoming": tomorrow_upcoming,
         "warnings": [],
         "generated_at_utc": now_iso,
     }
