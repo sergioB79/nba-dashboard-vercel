@@ -15,12 +15,10 @@ from typing import Dict, List, Optional, Set
 import pandas as pd
 from nba_api.stats.endpoints import leaguegamelog, scoreboardv3
 
-# ==============================
-#  CONFIG
-# ==============================
 
 SEASON = "2025-26"               # época atual
 SEASON_TYPE = "Regular Season"   # ou "Playoffs"
+# grava diretamente dentro de data/
 OUTPUT_FILE = os.path.join("data", f"nba_quarters_{SEASON.replace('-', '')}.csv")
 SLEEP_SECONDS = 0.8              # pausa entre chamadas à API (ajusta se precisares)
 
@@ -31,113 +29,16 @@ SLEEP_SECONDS = 0.8              # pausa entre chamadas à API (ajusta se precis
 
 def normalize_game_id(x) -> str:
     """
-    Converte GAME_ID para string com 10 dígitos, com zeros à esquerda.
-    Ex:
-      22500001      -> '0022500001'
-      '0022500001'  -> '0022500001'
-      2.2500001e7   -> '0022500001'
+    Converte GAME_ID para string com 10 dígitos, com zeros à esquerda se necessário.
+    Ex.: 22500001 -> '0022500001'
     """
-    s = "".join(ch for ch in str(x) if ch.isdigit())
+    if pd.isna(x):
+        return ""
+    s = str(x).strip()
+    # remover possíveis ".0" vindos de float
+    if s.endswith(".0"):
+        s = s[:-2]
     return s.zfill(10)
-
-
-def safe_int(val) -> int:
-    try:
-        return int(val)
-    except Exception:
-        return 0
-
-
-def get_season_games(season: str, season_type: str) -> pd.DataFrame:
-    """
-    Vai buscar todos os jogos da época via LeagueGameLog (uma linha por equipa),
-    depois reduz para uma linha por GAME_ID.
-    """
-    print(f"📝 A obter jogos da época {season} ({season_type}) via LeagueGameLog...")
-    lg = leaguegamelog.LeagueGameLog(
-        season=season,
-        season_type_all_star=season_type,
-    )
-    df = lg.get_data_frames()[0]
-
-    games = (
-        df[["GAME_ID", "GAME_DATE", "MATCHUP"]]
-        .drop_duplicates("GAME_ID")
-        .copy()
-    )
-
-    # Normalizar GAME_ID aqui logo
-    games["GAME_ID"] = games["GAME_ID"].apply(normalize_game_id)
-
-    # GAME_DATE como datetime + coluna só com date para agrupar por dia
-    games["GAME_DATE"] = pd.to_datetime(games["GAME_DATE"])
-    games["GAME_DAY"] = games["GAME_DATE"].dt.date
-
-    print(f"✅ Encontrados {len(games)} jogos únicos nesta época (LeagueGameLog).")
-    return games
-
-
-def fetch_day_from_scoreboard(game_day, request_timeout: int = 8) -> List[Dict]:
-    """
-    Usa ScoreboardV3 para um dia específico e devolve linhas
-    com Q1..Q4 + OT por equipa.
-    """
-    day_str = game_day.strftime("%Y-%m-%d")
-    try:
-        sb = scoreboardv3.ScoreboardV3(game_date=day_str, timeout=request_timeout)
-        data = sb.get_dict()
-        games = data.get("scoreboard", {}).get("games", [])
-    except Exception as e:
-        print(f"  ⚠️ Falha no ScoreboardV3 para {day_str}: {e}")
-        return []
-
-    rows: List[Dict] = []
-
-    for g in games:
-        game_id_raw = g.get("gameId")
-        if not game_id_raw:
-            continue
-        game_id = normalize_game_id(game_id_raw)
-
-        # home / away
-        for side in ["homeTeam", "awayTeam"]:
-            t = g.get(side, {}) or {}
-            periods = t.get("periods", []) or []
-
-            if not periods:
-                continue
-
-            # primeiros 4 períodos = Q1..Q4
-            q_scores = [safe_int(p.get("score")) for p in periods[:4]]
-            while len(q_scores) < 4:
-                q_scores.append(0)
-
-            total = safe_int(t.get("score"))
-            ot_total = max(0, total - sum(q_scores))
-
-            try:
-                team_id = int(t.get("teamId"))
-            except Exception:
-                continue
-
-            rows.append(
-                {
-                    "GAME_ID": game_id,
-                    "TEAM_ID": team_id,
-                    "TEAM_ABBREVIATION": t.get("teamTricode") or "",
-                    "TEAM_NAME": t.get("teamName") or "",
-                    "Q1": q_scores[0],
-                    "Q2": q_scores[1],
-                    "Q3": q_scores[2],
-                    "Q4": q_scores[3],
-                    "OT": ot_total,
-                    "OT_FLAG": 1 if len(periods) > 4 else 0,
-                    "OT_PERIODS": max(0, len(periods) - 4),
-                    "PTS": total,
-                }
-            )
-
-    return rows
 
 
 def load_existing_output(path: str) -> Optional[pd.DataFrame]:
@@ -158,78 +59,172 @@ def load_existing_output(path: str) -> Optional[pd.DataFrame]:
         return None
 
 
-def get_existing_game_ids(existing: Optional[pd.DataFrame]) -> Set[str]:
+def get_existing_game_ids(df: Optional[pd.DataFrame]) -> Set[str]:
     """
-    Devolve o conjunto de GAME_ID já presentes no CSV para esta SEASON.
-    Se não houver ficheiro, devolve conjunto vazio.
-    IMPORTANTE: assume GAME_ID já normalizado (normalize_game_id).
+    Extrai o conjunto de GAME_ID já presentes no CSV.
     """
-    if existing is None:
+    if df is None or df.empty:
         return set()
-
-    if "GAME_ID" not in existing.columns:
-        return set()
-
-    # Se tiver coluna SEASON, filtramos só essa época; se não, usamos todos.
-    if "SEASON" in existing.columns:
-        mask = existing["SEASON"].astype(str) == SEASON
-        ids = existing.loc[mask, "GAME_ID"].astype(str).unique()
-    else:
-        ids = existing["GAME_ID"].astype(str).unique()
-
-    existing_ids = set(ids)
-    print(f"📌 GAME_ID já existentes para {SEASON}: {len(existing_ids)}")
-    return existing_ids
+    # garantir que estão normalizados
+    return set(df["GAME_ID"].astype(str).apply(normalize_game_id).unique())
 
 
-def cleanup_and_write(full_df: pd.DataFrame, games_df: pd.DataFrame) -> None:
+def get_season_games(season: str, season_type: str) -> pd.DataFrame:
     """
-    - Normaliza GAME_ID no full_df
-    - Remove jogos cujo GAME_ID não está em games_df (garante só Regular Season 2025-26)
-    - Remove duplicados (GAME_ID + TEAM_ID)
-    - Ordena e grava o CSV final.
+    Vai ao LeagueGameLog buscar TODOS os jogos (home e away) dessa época e tipo de época.
+
+    Devolve DataFrame com colunas importantes: GAME_ID, GAME_DATE, MATCHUP, TEAM_ID, PTS, etc.
     """
-    if full_df is None or full_df.empty:
-        print("❌ Nada para gravar (full_df vazio).")
-        return
+    lg = leaguegamelog.LeagueGameLog(
+        league_id="00",
+        season=season,
+        season_type_all_star=season_type,
+        counter=0,
+        direction="ASC",
+        player_or_team="T",  # T -> Team
+        sorter="DATE"
+    )
+    df = lg.get_data_frames()[0]
+
+    # Converter GAME_DATE para datetime e criar coluna de "dia" (yyyy-mm-dd)
+    df["GAME_DATE"] = pd.to_datetime(df["GAME_DATE"])
+    df["GAME_DAY"] = df["GAME_DATE"].dt.floor("D")
+
+    # Normalizar GAME_ID aqui para já vir limpo
+    df["GAME_ID"] = df["GAME_ID"].apply(normalize_game_id)
+
+    print(f"✅ LeagueGameLog devolveu {len(df)} linhas (equipa/jogo).")
+    return df
+
+
+def fetch_day_from_scoreboard(day: pd.Timestamp) -> List[Dict]:
+    """
+    Vai ao ScoreboardV3 para um determinado dia (yyyy-mm-dd) e devolve
+    uma lista de dicts com estatísticas por equipa/jogo:
+
+    [
+      {
+        "GAME_ID": "0022500001",
+        "TEAM_ID": 1610612737,
+        "TEAM_ABBREVIATION": "ATL",
+        "TEAM_NAME": "Atlanta Hawks",
+        "MATCHUP": "ATL @ BOS",
+        "Q1": 25,
+        "Q2": 31,
+        "Q3": 22,
+        "Q4": 27,
+        "OT": 10,
+        "PTS": 115,
+      },
+      ...
+    ]
+    """
+    date_str = day.strftime("%Y-%m-%d")
+    sb = scoreboardv3.ScoreboardV3(game_date=date_str, league_id="00", day_offset=0)
+    games = sb.get_data_frames()
+
+    # scoreboardv3 devolve vários DataFrames; o que nos interessa é o "LineScore"
+    # mas, na versão atual da nba_api, ele costuma vir como o segundo DataFrame.
+    if len(games) < 2:
+        print(f"⚠️ ScoreboardV3({date_str}) não devolveu LineScore esperado.")
+        return []
+
+    # Tentamos identificar o DF que tenha colunas "GAME_ID", "TEAM_ID" etc.
+    linescore_df = None
+    for df in games:
+        if {"GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION", "TEAM_NAME"}.issubset(df.columns):
+            linescore_df = df
+            break
+
+    if linescore_df is None or linescore_df.empty:
+        print(f"⚠️ ScoreboardV3({date_str}) não tem LineScore com as colunas esperadas.")
+        return []
+
+    # Alguns ScoreboardV3 já trazem Q1, Q2, Q3, Q4, OT, PTS
+    cols_needed = ["GAME_ID", "TEAM_ID", "TEAM_ABBREVIATION", "TEAM_NAME", "PTS"]
+    quarter_cols = ["PTS_QTR1", "PTS_QTR2", "PTS_QTR3", "PTS_QTR4"]
+
+    for c in cols_needed + quarter_cols:
+        if c not in linescore_df.columns:
+            print(f"⚠️ Coluna {c} em falta em LineScore({date_str}).")
+            return []
+
+    rows = []
+    for _, row in linescore_df.iterrows():
+        game_id = normalize_game_id(row["GAME_ID"])
+        team_id = int(row["TEAM_ID"])
+        team_abbr = str(row["TEAM_ABBREVIATION"])
+        team_name = str(row["TEAM_NAME"])
+
+        q1 = int(row["PTS_QTR1"])
+        q2 = int(row["PTS_QTR2"])
+        q3 = int(row["PTS_QTR3"])
+        q4 = int(row["PTS_QTR4"])
+        pts_total = int(row["PTS"])
+
+        ot = pts_total - (q1 + q2 + q3 + q4)
+
+        rows.append(
+            {
+                "GAME_ID": game_id,
+                "TEAM_ID": team_id,
+                "TEAM_ABBREVIATION": team_abbr,
+                "TEAM_NAME": team_name,
+                "Q1": q1,
+                "Q2": q2,
+                "Q3": q3,
+                "Q4": q4,
+                "OT": ot,
+                "PTS": pts_total,
+            }
+        )
+
+    return rows
+
+
+def cleanup_and_write(df: pd.DataFrame, games_df: pd.DataFrame) -> None:
+    """
+    Limpa / normaliza o DataFrame final e grava no OUTPUT_FILE:
+
+    - Normaliza GAME_ID.
+    - Remove linhas com GAME_ID que não existam no LeagueGameLog dessa época.
+    - Garante tipos numéricos em Q1..Q4, OT, PTS.
+    - Ordena por GAME_DATE + TEAM_ABBREVIATION.
+    """
+    print("🧹 A limpar e normalizar DataFrame final...")
+
+    df = df.copy()
 
     # Normalizar GAME_ID
-    full_df = full_df.copy()
-    full_df["GAME_ID"] = full_df["GAME_ID"].apply(normalize_game_id)
+    df["GAME_ID"] = df["GAME_ID"].apply(normalize_game_id)
 
-    # Conjunto de GAME_ID válidos para esta época (já normalizados em get_season_games)
-    allowed_ids = set(games_df["GAME_ID"].astype(str).unique())
+    # Lista de GAME_ID válidos (que existem no LeagueGameLog da época)
+    valid_ids = set(games_df["GAME_ID"].astype(str).apply(normalize_game_id).unique())
+    before = len(df)
+    df = df[df["GAME_ID"].isin(valid_ids)].copy()
+    after = len(df)
+    print(f"   Removidas {before - after} linhas com GAME_ID fora da época {SEASON}.")
 
-    before_filter = len(full_df)
-    full_df = full_df[full_df["GAME_ID"].isin(allowed_ids)]
-    after_filter = len(full_df)
-    removed_lixo = before_filter - after_filter
-    if removed_lixo > 0:
-        print(f"🧹 Removidos {removed_lixo} registos cujo GAME_ID não pertence à época {SEASON}.")
+    # Converter Q1..Q4, OT, PTS para numérico
+    for col in ["Q1", "Q2", "Q3", "Q4", "OT", "PTS"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
 
-    # TEAM_ID como int se existir
-    if "TEAM_ID" in full_df.columns:
-        full_df["TEAM_ID"] = full_df["TEAM_ID"].apply(safe_int)
+    # Unir com meta de jogos (GAME_DATE, MATCHUP) vindas de games_df
+    meta = (
+        games_df[["GAME_ID", "GAME_DATE", "MATCHUP"]]
+        .drop_duplicates("GAME_ID")
+        .copy()
+    )
+    meta["GAME_ID"] = meta["GAME_ID"].apply(normalize_game_id)
 
-    # Remover duplicados por GAME_ID + TEAM_ID
-    if {"GAME_ID", "TEAM_ID"}.issubset(full_df.columns):
-        before_dups = len(full_df)
-        full_df = full_df.drop_duplicates(subset=["GAME_ID", "TEAM_ID"], keep="last")
-        after_dups = len(full_df)
-        removed_dups = before_dups - after_dups
-        if removed_dups > 0:
-            print(f"🧹 Removidos {removed_dups} registos duplicados (GAME_ID+TEAM_ID).")
+    df = df.merge(meta, on="GAME_ID", how="left")
 
-    # Ordenar e gravar
-    sort_cols = [c for c in ["GAME_DATE", "GAME_ID", "TEAM_ID"] if c in full_df.columns]
-    if sort_cols:
-        full_df = full_df.sort_values(sort_cols).reset_index(drop=True)
+    # Ordenar por GAME_DATE, GAME_ID, TEAM_ABBREVIATION
+    df.sort_values(["GAME_DATE", "GAME_ID", "TEAM_ABBREVIATION"], inplace=True)
 
-    full_df.to_csv(OUTPUT_FILE, index=False, encoding="utf-8-sig")
-    print(f"\n✅ Ficheiro atualizado em: {OUTPUT_FILE}")
-    print(f"   Linhas (equipa/jogo): {len(full_df)}")
-    print("   Jogos únicos (GAME_ID):", full_df["GAME_ID"].nunique())
-    print("   Colunas:", ", ".join(full_df.columns))
+    print(f"💾 A gravar ficheiro final: {OUTPUT_FILE} (linhas: {len(df)})")
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+    df.to_csv(OUTPUT_FILE, index=False, encoding="utf-8")
 
 
 # ==============================
@@ -244,7 +239,15 @@ def main():
         existing_df["GAME_ID"] = existing_df["GAME_ID"].apply(normalize_game_id)
 
     # 2) Jogos da época (todos) via LeagueGameLog
-    games_df = get_season_games(SEASON, SEASON_TYPE)
+    try:
+        games_df = get_season_games(SEASON, SEASON_TYPE)
+    except Exception as exc:
+        # Não deixamos o script rebentar se a API da NBA estiver lenta/offline.
+        print("⚠️ Não foi possível obter LeagueGameLog da stats.nba.com:")
+        print(f"   {exc}")
+        print("⚠️ A atualização será tentada novamente na próxima execução.")
+        return
+
     if games_df.empty:
         print("❌ LeagueGameLog devolveu vazio. Nada para fazer.")
         return
