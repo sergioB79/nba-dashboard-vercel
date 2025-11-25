@@ -2292,6 +2292,24 @@
           <div><strong>Arena:</strong> ${escapeHtml(arenaFull)}</div>
           <div class="info" style="grid-column:1 / -1;">Equipas destacadas nas tabelas de quartos/OT.</div>
         </div>
+        <div class="analysis-columns">
+          <div class="analysis-col">
+            <h3>Casa</h3>
+            <div><strong>Equipa:</strong> ${escapeHtml(homeCode || "-")} ${home.name ? "- " + escapeHtml(home.name) : ""}</div>
+            <div><strong>Ranking geral:</strong> ${homeLeagueRank}</div>
+            <div><strong>Ranking conferência:</strong> ${homeConfRank}</div>
+            <div><strong>Ranking só em casa (Liga/Conf):</strong> ${homeStanding ? `${homeLeagueRankHome} / ${homeConfRankHome}` : "—"}</div>
+            ${renderTeamPanel(homeCode, "Casa", home)}
+          </div>
+          <div class="analysis-col">
+            <h3>Fora</h3>
+            <div><strong>Equipa:</strong> ${escapeHtml(awayCode || "-")} ${away.name ? "– " + escapeHtml(away.name) : ""}</div>
+            <div><strong>Ranking geral:</strong> ${awayLeagueRank}</div>
+            <div><strong>Ranking conferência:</strong> ${awayConfRank}</div>
+            <div><strong>Ranking só fora (Liga/Conf):</strong> ${awayStanding ? `${awayLeagueRankAway} / ${awayConfRankAway}` : "—"}</div>
+            ${renderTeamPanel(awayCode, "Fora", away)}
+          </div>
+        </div>
         <div class="card">
           <h2>Projeções (modelo simples, sem odds)</h2>
           ${preds ? `
@@ -2379,24 +2397,6 @@
               </div>
             ` : ""}
           ` : `<div class="info">Sem dados suficientes para projetar (precisa de histórico de jogos das duas equipas).</div>`}
-        </div>
-        <div class="analysis-columns">
-          <div class="analysis-col">
-            <h3>Casa</h3>
-            <div><strong>Equipa:</strong> ${escapeHtml(homeCode || "-")} ${home.name ? "- " + escapeHtml(home.name) : ""}</div>
-            <div><strong>Ranking geral:</strong> ${homeLeagueRank}</div>
-            <div><strong>Ranking conferência:</strong> ${homeConfRank}</div>
-            <div><strong>Ranking só em casa (Liga/Conf):</strong> ${homeStanding ? `${homeLeagueRankHome} / ${homeConfRankHome}` : "—"}</div>
-            ${renderTeamPanel(homeCode, "Casa", home)}
-          </div>
-          <div class="analysis-col">
-            <h3>Fora</h3>
-            <div><strong>Equipa:</strong> ${escapeHtml(awayCode || "-")} ${away.name ? "– " + escapeHtml(away.name) : ""}</div>
-            <div><strong>Ranking geral:</strong> ${awayLeagueRank}</div>
-            <div><strong>Ranking conferência:</strong> ${awayConfRank}</div>
-            <div><strong>Ranking só fora (Liga/Conf):</strong> ${awayStanding ? `${awayLeagueRankAway} / ${awayConfRankAway}` : "—"}</div>
-            ${renderTeamPanel(awayCode, "Fora", away)}
-          </div>
         </div>
       `;
 
