@@ -1,4 +1,4 @@
-name: Update NBA CSV
+name: Update NBA Data
 
 on:
   schedule:
@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  update-csv:
+  update-data:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,10 +28,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install nba_api pandas requests
 
-      - name: Run getQuarters.py
+      - name: Update quarters CSV
         run: python getQuarters.py
 
-      - name: Run getGames.py
+      - name: Update games JSON
         run: python getGames.py
 
       - name: Commit and push if data changed
