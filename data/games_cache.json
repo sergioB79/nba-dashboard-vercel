@@ -3,20 +3,20 @@
   "live_games": [],
   "today_upcoming": [
     {
-      "game_id": "0022500283",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
+      "game_id": "0022500057",
+      "status": 1,
+      "status_text": "7:00 pm ET",
+      "period": 0,
       "clock": "",
-      "start_time_utc": "2025-11-25T00:00:00Z",
+      "start_time_utc": "2025-11-26T00:00:00Z",
       "home": {
-        "teamId": 1610612754,
-        "teamTricode": "IND",
-        "teamName": "Pacers",
-        "teamCity": "Indiana",
-        "wins": 2,
+        "teamId": 1610612764,
+        "teamTricode": "WAS",
+        "teamName": "Wizards",
+        "teamCity": "Washington",
+        "wins": 1,
         "losses": 15,
-        "score": 117,
+        "score": 0,
         "seed": null,
         "inBonus": null,
         "timeoutsRemaining": 0,
@@ -24,163 +24,37 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 0
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 23
+            "score": 0
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 33
+            "score": 0
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 29
+            "score": 0
           }
         ],
-        "tricode": "IND",
-        "name": "Pacers",
-        "city": "Indiana"
+        "tricode": "WAS",
+        "name": "Wizards",
+        "city": "Washington",
+        "record": "1-15"
       },
       "away": {
-        "teamId": 1610612765,
-        "teamTricode": "DET",
-        "teamName": "Pistons",
-        "teamCity": "Detroit",
-        "wins": 15,
-        "losses": 2,
-        "score": 122,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 35
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 36
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 30
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 21
-          }
-        ],
-        "tricode": "DET",
-        "name": "Pistons",
-        "city": "Detroit"
-      }
-    },
-    {
-      "game_id": "0022500284",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
-      "clock": "",
-      "start_time_utc": "2025-11-25T00:00:00Z",
-      "home": {
-        "teamId": 1610612761,
-        "teamTricode": "TOR",
-        "teamName": "Raptors",
-        "teamCity": "Toronto",
-        "wins": 13,
-        "losses": 5,
-        "score": 110,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 1,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 29
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 31
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 22
-          }
-        ],
-        "tricode": "TOR",
-        "name": "Raptors",
-        "city": "Toronto"
-      },
-      "away": {
-        "teamId": 1610612739,
-        "teamTricode": "CLE",
-        "teamName": "Cavaliers",
-        "teamCity": "Cleveland",
-        "wins": 12,
+        "teamId": 1610612737,
+        "teamTricode": "ATL",
+        "teamName": "Hawks",
+        "teamCity": "Atlanta",
+        "wins": 11,
         "losses": 7,
-        "score": 99,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 1,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 32
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 22
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 22
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 23
-          }
-        ],
-        "tricode": "CLE",
-        "name": "Cavaliers",
-        "city": "Cleveland"
-      }
-    },
-    {
-      "game_id": "0022500285",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
-      "clock": "",
-      "start_time_utc": "2025-11-25T00:30:00Z",
-      "home": {
-        "teamId": 1610612751,
-        "teamTricode": "BKN",
-        "teamName": "Nets",
-        "teamCity": "Brooklyn",
-        "wins": 3,
-        "losses": 14,
-        "score": 100,
+        "score": 0,
         "seed": null,
         "inBonus": null,
         "timeoutsRemaining": 0,
@@ -188,409 +62,45 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 26
+            "score": 0
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 22
+            "score": 0
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 27
+            "score": 0
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 0
           }
         ],
-        "tricode": "BKN",
-        "name": "Nets",
-        "city": "Brooklyn"
-      },
-      "away": {
-        "teamId": 1610612752,
-        "teamTricode": "NYK",
-        "teamName": "Knicks",
-        "teamCity": "New York",
-        "wins": 10,
-        "losses": 6,
-        "score": 113,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 1,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 24
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 27
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 38
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 24
-          }
-        ],
-        "tricode": "NYK",
-        "name": "Knicks",
-        "city": "New York"
+        "tricode": "ATL",
+        "name": "Hawks",
+        "city": "Atlanta",
+        "record": "11-7"
       }
     },
     {
-      "game_id": "0022500286",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
+      "game_id": "0022500058",
+      "status": 1,
+      "status_text": "8:00 pm ET",
+      "period": 0,
       "clock": "",
-      "start_time_utc": "2025-11-25T00:30:00Z",
+      "start_time_utc": "2025-11-26T01:00:00Z",
       "home": {
-        "teamId": 1610612748,
-        "teamTricode": "MIA",
-        "teamName": "Heat",
-        "teamCity": "Miami",
-        "wins": 12,
-        "losses": 6,
-        "score": 106,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 20
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 32
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 26
-          }
-        ],
-        "tricode": "MIA",
-        "name": "Heat",
-        "city": "Miami"
-      },
-      "away": {
-        "teamId": 1610612742,
-        "teamTricode": "DAL",
-        "teamName": "Mavericks",
-        "teamCity": "Dallas",
-        "wins": 5,
-        "losses": 14,
-        "score": 102,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 19
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 25
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 30
-          }
-        ],
-        "tricode": "DAL",
-        "name": "Mavericks",
-        "city": "Dallas"
-      }
-    },
-    {
-      "game_id": "0022500287",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
-      "clock": "",
-      "start_time_utc": "2025-11-25T01:00:00Z",
-      "home": {
-        "teamId": 1610612763,
-        "teamTricode": "MEM",
-        "teamName": "Grizzlies",
-        "teamCity": "Memphis",
-        "wins": 6,
-        "losses": 12,
-        "score": 115,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 23
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 31
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 31
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 30
-          }
-        ],
-        "tricode": "MEM",
-        "name": "Grizzlies",
-        "city": "Memphis"
-      },
-      "away": {
-        "teamId": 1610612743,
-        "teamTricode": "DEN",
-        "teamName": "Nuggets",
-        "teamCity": "Denver",
-        "wins": 13,
-        "losses": 4,
-        "score": 125,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 1,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 27
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 35
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 31
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 32
-          }
-        ],
-        "tricode": "DEN",
-        "name": "Nuggets",
-        "city": "Denver"
-      }
-    },
-    {
-      "game_id": "0022500288",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
-      "clock": "",
-      "start_time_utc": "2025-11-25T01:00:00Z",
-      "home": {
-        "teamId": 1610612749,
-        "teamTricode": "MIL",
-        "teamName": "Bucks",
-        "teamCity": "Milwaukee",
-        "wins": 8,
-        "losses": 10,
-        "score": 103,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 1,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 27
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 26
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 21
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 29
-          }
-        ],
-        "tricode": "MIL",
-        "name": "Bucks",
-        "city": "Milwaukee"
-      },
-      "away": {
-        "teamId": 1610612757,
-        "teamTricode": "POR",
-        "teamName": "Trail Blazers",
-        "teamCity": "Portland",
-        "wins": 8,
-        "losses": 10,
-        "score": 115,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 1,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 32
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 33
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 30
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 20
-          }
-        ],
-        "tricode": "POR",
-        "name": "Trail Blazers",
-        "city": "Portland"
-      }
-    },
-    {
-      "game_id": "0022500289",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
-      "clock": "",
-      "start_time_utc": "2025-11-25T01:00:00Z",
-      "home": {
-        "teamId": 1610612740,
-        "teamTricode": "NOP",
-        "teamName": "Pelicans",
-        "teamCity": "New Orleans",
-        "wins": 3,
-        "losses": 15,
-        "score": 143,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 37
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 37
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 34
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 35
-          }
-        ],
-        "tricode": "NOP",
-        "name": "Pelicans",
-        "city": "New Orleans"
-      },
-      "away": {
-        "teamId": 1610612741,
-        "teamTricode": "CHI",
-        "teamName": "Bulls",
-        "teamCity": "Chicago",
+        "teamId": 1610612755,
+        "teamTricode": "PHI",
+        "teamName": "76ers",
+        "teamCity": "Philadelphia",
         "wins": 9,
-        "losses": 8,
-        "score": 130,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 1,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 30
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 35
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 37
-          }
-        ],
-        "tricode": "CHI",
-        "name": "Bulls",
-        "city": "Chicago"
-      }
-    },
-    {
-      "game_id": "0022500290",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
-      "clock": "",
-      "start_time_utc": "2025-11-25T02:30:00Z",
-      "home": {
-        "teamId": 1610612756,
-        "teamTricode": "PHX",
-        "teamName": "Suns",
-        "teamCity": "Phoenix",
-        "wins": 11,
         "losses": 7,
-        "score": 92,
+        "score": 0,
         "seed": null,
         "inBonus": null,
         "timeoutsRemaining": 0,
@@ -598,163 +108,121 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 23
+            "score": 0
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 27
+            "score": 0
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 0
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 17
+            "score": 0
           }
         ],
-        "tricode": "PHX",
-        "name": "Suns",
-        "city": "Phoenix"
+        "tricode": "PHI",
+        "name": "76ers",
+        "city": "Philadelphia",
+        "record": "9-7"
       },
       "away": {
-        "teamId": 1610612745,
-        "teamTricode": "HOU",
-        "teamName": "Rockets",
-        "teamCity": "Houston",
-        "wins": 11,
-        "losses": 4,
-        "score": 114,
+        "teamId": 1610612753,
+        "teamTricode": "ORL",
+        "teamName": "Magic",
+        "teamCity": "Orlando",
+        "wins": 10,
+        "losses": 8,
+        "score": 0,
         "seed": null,
         "inBonus": null,
-        "timeoutsRemaining": 1,
+        "timeoutsRemaining": 0,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 30
+            "score": 0
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 29
+            "score": 0
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 0
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 30
+            "score": 0
           }
         ],
-        "tricode": "HOU",
-        "name": "Rockets",
-        "city": "Houston"
+        "tricode": "ORL",
+        "name": "Magic",
+        "city": "Orlando",
+        "record": "10-8"
       }
     },
     {
-      "game_id": "0022500291",
-      "status": 3,
-      "status_text": "Final",
-      "period": 4,
+      "game_id": "0022500059",
+      "status": 1,
+      "status_text": "11:00 pm ET",
+      "period": 0,
       "clock": "",
-      "start_time_utc": "2025-11-25T03:00:00Z",
+      "start_time_utc": "2025-11-26T04:00:00Z",
       "home": {
-        "teamId": 1610612744,
-        "teamTricode": "GSW",
-        "teamName": "Warriors",
-        "teamCity": "Golden State",
-        "wins": 10,
-        "losses": 9,
-        "score": 134,
+        "teamId": 1610612747,
+        "teamTricode": "LAL",
+        "teamName": "Lakers",
+        "teamCity": "Los Angeles",
+        "wins": 12,
+        "losses": 4,
+        "score": 0,
         "seed": null,
         "inBonus": null,
-        "timeoutsRemaining": 1,
+        "timeoutsRemaining": 0,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 26
+            "score": 0
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 41
+            "score": 0
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 39
+            "score": 0
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 28
+            "score": 0
           }
         ],
-        "tricode": "GSW",
-        "name": "Warriors",
-        "city": "Golden State"
+        "tricode": "LAL",
+        "name": "Lakers",
+        "city": "Los Angeles",
+        "record": "12-4"
       },
       "away": {
-        "teamId": 1610612762,
-        "teamTricode": "UTA",
-        "teamName": "Jazz",
-        "teamCity": "Utah",
+        "teamId": 1610612746,
+        "teamTricode": "LAC",
+        "teamName": "Clippers",
+        "teamCity": "LA",
         "wins": 5,
         "losses": 12,
-        "score": 117,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 1,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 35
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 20
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 29
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 33
-          }
-        ],
-        "tricode": "UTA",
-        "name": "Jazz",
-        "city": "Utah"
-      }
-    },
-    {
-      "game_id": "0022500292",
-      "status": 3,
-      "status_text": "Final/OT",
-      "period": 5,
-      "clock": "",
-      "start_time_utc": "2025-11-25T03:00:00Z",
-      "home": {
-        "teamId": 1610612758,
-        "teamTricode": "SAC",
-        "teamName": "Kings",
-        "teamCity": "Sacramento",
-        "wins": 5,
-        "losses": 13,
-        "score": 117,
+        "score": 0,
         "seed": null,
         "inBonus": null,
         "timeoutsRemaining": 0,
@@ -762,78 +230,32 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 23
+            "score": 0
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 23
+            "score": 0
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 31
+            "score": 0
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 24
-          },
-          {
-            "period": 5,
-            "periodType": "OVERTIME",
-            "score": 16
+            "score": 0
           }
         ],
-        "tricode": "SAC",
-        "name": "Kings",
-        "city": "Sacramento"
-      },
-      "away": {
-        "teamId": 1610612750,
-        "teamTricode": "MIN",
-        "teamName": "Timberwolves",
-        "teamCity": "Minnesota",
-        "wins": 10,
-        "losses": 7,
-        "score": 112,
-        "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 27
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 27
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 19
-          },
-          {
-            "period": 5,
-            "periodType": "OVERTIME",
-            "score": 11
-          }
-        ],
-        "tricode": "MIN",
-        "name": "Timberwolves",
-        "city": "Minnesota"
+        "tricode": "LAC",
+        "name": "Clippers",
+        "city": "LA",
+        "record": "5-12"
       }
     }
   ],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2025-11-25T16:31:13.350941+00:00"
+  "generated_at_utc": "2025-11-25T17:11:41.872804+00:00"
 }

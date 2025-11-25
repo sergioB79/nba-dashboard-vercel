@@ -36,6 +36,14 @@ def build_team(team_raw: dict) -> dict:
     team_tricode = team_raw.get("teamTricode")
     team_name = team_raw.get("teamName")
     team_city = team_raw.get("teamCity")
+    wins = team_raw.get("wins")
+    losses = team_raw.get("losses")
+
+    # record tipo "15-3"
+    if wins is not None and losses is not None:
+        record = f"{wins}-{losses}"
+    else:
+        record = ""
 
     return {
         # campos originais
@@ -43,8 +51,8 @@ def build_team(team_raw: dict) -> dict:
         "teamTricode": team_tricode,
         "teamName": team_name,
         "teamCity": team_city,
-        "wins": team_raw.get("wins"),
-        "losses": team_raw.get("losses"),
+        "wins": wins,
+        "losses": losses,
         "score": team_raw.get("score"),
         "seed": team_raw.get("seed"),
         "inBonus": team_raw.get("inBonus"),
@@ -55,6 +63,7 @@ def build_team(team_raw: dict) -> dict:
         "tricode": team_tricode,
         "name": team_name,
         "city": team_city,
+        "record": record,
     }
 
 
@@ -100,17 +109,20 @@ def fetch_games():
 
         # 1 = agendado, 2 = live, 3 = final
         if status == 2:
+            # jogos em directo
             live.append(simple)
-        else:
-            # por agora mandamos tudo o resto para "upcoming";
-            # se quiseres só jogos com status == 1, é trocar esta condição
+        elif status == 1:
+            # só jogos agendados vão para "upcoming"
             upcoming.append(simple)
+        else:
+            # status 3 (Final) e outros: ignoramos nesta lista
+            continue
 
     return {
         "ok": True,
         "live_games": live,
         "today_upcoming": upcoming,
-        "tomorrow_upcoming": [],
+        "tomorrow_upcoming": [],  # este endpoint só dá o dia de hoje
         "warnings": [],
         "generated_at_utc": now_iso,
     }
