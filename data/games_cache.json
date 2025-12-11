@@ -1,8 +1,93 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "0022501204",
+      "status": 2,
+      "status_text": "Q4 9:13",
+      "period": 4,
+      "clock": "PT09M13.00S",
+      "start_time_utc": "2025-12-11T03:00:00Z",
+      "home": {
+        "teamId": 1610612747,
+        "teamTricode": "LAL",
+        "teamName": "Lakers",
+        "teamCity": "Los Angeles",
+        "wins": 17,
+        "losses": 6,
+        "score": 94,
+        "seed": 2,
+        "inBonus": "0",
+        "timeoutsRemaining": 2,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 30
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 28
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 29
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 7
+          }
+        ],
+        "tricode": "LAL",
+        "name": "Lakers",
+        "city": "Los Angeles",
+        "record": "17-6"
+      },
+      "away": {
+        "teamId": 1610612759,
+        "teamTricode": "SAS",
+        "teamName": "Spurs",
+        "teamCity": "San Antonio",
+        "wins": 16,
+        "losses": 7,
+        "score": 114,
+        "seed": 3,
+        "inBonus": "0",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 39
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 31
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 34
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 10
+          }
+        ],
+        "tricode": "SAS",
+        "name": "Spurs",
+        "city": "San Antonio",
+        "record": "16-7"
+      }
+    }
+  ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2025-12-10T05:15:12.441082+00:00"
+  "generated_at_utc": "2025-12-11T05:16:10.248860+00:00"
 }
