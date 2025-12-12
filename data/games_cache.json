@@ -2,28 +2,28 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022501204",
+      "game_id": "0022501208",
       "status": 2,
-      "status_text": "Q4 9:13",
+      "status_text": "Q4 :48.0",
       "period": 4,
-      "clock": "PT09M13.00S",
-      "start_time_utc": "2025-12-11T03:00:00Z",
+      "clock": "PT00M48.00S",
+      "start_time_utc": "2025-12-12T03:00:00Z",
       "home": {
-        "teamId": 1610612747,
-        "teamTricode": "LAL",
-        "teamName": "Lakers",
-        "teamCity": "Los Angeles",
-        "wins": 17,
-        "losses": 6,
-        "score": 94,
-        "seed": 2,
+        "teamId": 1610612758,
+        "teamTricode": "SAC",
+        "teamName": "Kings",
+        "teamCity": "Sacramento",
+        "wins": 6,
+        "losses": 18,
+        "score": 100,
+        "seed": null,
         "inBonus": "0",
         "timeoutsRemaining": 2,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 30
+            "score": 26
           },
           {
             "period": 2,
@@ -33,61 +33,61 @@
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 29
+            "score": 27
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 7
+            "score": 19
           }
         ],
-        "tricode": "LAL",
-        "name": "Lakers",
-        "city": "Los Angeles",
-        "record": "17-6"
+        "tricode": "SAC",
+        "name": "Kings",
+        "city": "Sacramento",
+        "record": "6-18"
       },
       "away": {
-        "teamId": 1610612759,
-        "teamTricode": "SAS",
-        "teamName": "Spurs",
-        "teamCity": "San Antonio",
-        "wins": 16,
-        "losses": 7,
-        "score": 114,
-        "seed": 3,
+        "teamId": 1610612743,
+        "teamTricode": "DEN",
+        "teamName": "Nuggets",
+        "teamCity": "Denver",
+        "wins": 17,
+        "losses": 6,
+        "score": 133,
+        "seed": null,
         "inBonus": "0",
-        "timeoutsRemaining": 3,
+        "timeoutsRemaining": 2,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 39
+            "score": 41
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 31
+            "score": 36
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 34
+            "score": 32
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 10
+            "score": 24
           }
         ],
-        "tricode": "SAS",
-        "name": "Spurs",
-        "city": "San Antonio",
-        "record": "16-7"
+        "tricode": "DEN",
+        "name": "Nuggets",
+        "city": "Denver",
+        "record": "17-6"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2025-12-11T05:16:10.248860+00:00"
+  "generated_at_utc": "2025-12-12T05:15:04.011595+00:00"
 }
