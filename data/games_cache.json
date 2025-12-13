@@ -2,66 +2,28 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022501208",
+      "game_id": "0022501215",
       "status": 2,
-      "status_text": "Q4 :48.0",
+      "status_text": "Q4 4:57",
       "period": 4,
-      "clock": "PT00M48.00S",
-      "start_time_utc": "2025-12-12T03:00:00Z",
+      "clock": "PT04M57.00S",
+      "start_time_utc": "2025-12-13T03:00:00Z",
       "home": {
-        "teamId": 1610612758,
-        "teamTricode": "SAC",
-        "teamName": "Kings",
-        "teamCity": "Sacramento",
-        "wins": 6,
-        "losses": 18,
-        "score": 100,
+        "teamId": 1610612744,
+        "teamTricode": "GSW",
+        "teamName": "Warriors",
+        "teamCity": "Golden State",
+        "wins": 13,
+        "losses": 12,
+        "score": 101,
         "seed": null,
         "inBonus": "0",
         "timeoutsRemaining": 2,
         "periods": [
           {
             "period": 1,
-            "periodType": "REGULAR",
-            "score": 26
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 3,
             "periodType": "REGULAR",
             "score": 27
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 19
-          }
-        ],
-        "tricode": "SAC",
-        "name": "Kings",
-        "city": "Sacramento",
-        "record": "6-18"
-      },
-      "away": {
-        "teamId": 1610612743,
-        "teamTricode": "DEN",
-        "teamName": "Nuggets",
-        "teamCity": "Denver",
-        "wins": 17,
-        "losses": 6,
-        "score": 133,
-        "seed": null,
-        "inBonus": "0",
-        "timeoutsRemaining": 2,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 41
           },
           {
             "period": 2,
@@ -71,23 +33,61 @@
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 28
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 24
+            "score": 10
           }
         ],
-        "tricode": "DEN",
-        "name": "Nuggets",
-        "city": "Denver",
-        "record": "17-6"
+        "tricode": "GSW",
+        "name": "Warriors",
+        "city": "Golden State",
+        "record": "13-12"
+      },
+      "away": {
+        "teamId": 1610612750,
+        "teamTricode": "MIN",
+        "teamName": "Timberwolves",
+        "teamCity": "Minnesota",
+        "wins": 15,
+        "losses": 9,
+        "score": 108,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 28
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 33
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 27
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 20
+          }
+        ],
+        "tricode": "MIN",
+        "name": "Timberwolves",
+        "city": "Minnesota",
+        "record": "15-9"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2025-12-12T05:15:04.011595+00:00"
+  "generated_at_utc": "2025-12-13T05:13:11.303634+00:00"
 }
