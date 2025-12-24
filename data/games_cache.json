@@ -2,20 +2,20 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022500408",
+      "game_id": "0022500421",
       "status": 2,
-      "status_text": "Q4 6:06",
+      "status_text": "Q4 6:58",
       "period": 4,
-      "clock": "PT06M06.00S",
-      "start_time_utc": "2025-12-23T03:00:00Z",
+      "clock": "PT06M58.00S",
+      "start_time_utc": "2025-12-24T03:00:00Z",
       "home": {
-        "teamId": 1610612757,
-        "teamTricode": "POR",
-        "teamName": "Trail Blazers",
-        "teamCity": "Portland",
-        "wins": 12,
-        "losses": 16,
-        "score": 95,
+        "teamId": 1610612758,
+        "teamTricode": "SAC",
+        "teamName": "Kings",
+        "teamCity": "Sacramento",
+        "wins": 7,
+        "losses": 22,
+        "score": 105,
         "seed": null,
         "inBonus": "0",
         "timeoutsRemaining": 2,
@@ -23,37 +23,37 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 26
+            "score": 24
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 34
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 27
+            "score": 39
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 17
+            "score": 8
           }
         ],
-        "tricode": "POR",
-        "name": "Trail Blazers",
-        "city": "Portland",
-        "record": "12-16"
+        "tricode": "SAC",
+        "name": "Kings",
+        "city": "Sacramento",
+        "record": "7-22"
       },
       "away": {
         "teamId": 1610612765,
         "teamTricode": "DET",
         "teamName": "Pistons",
         "teamCity": "Detroit",
-        "wins": 22,
+        "wins": 23,
         "losses": 6,
-        "score": 99,
+        "score": 123,
         "seed": null,
         "inBonus": "0",
         "timeoutsRemaining": 3,
@@ -61,45 +61,45 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 30
+            "score": 37
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 31
+            "score": 38
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 34
+            "score": 40
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 4
+            "score": 8
           }
         ],
         "tricode": "DET",
         "name": "Pistons",
         "city": "Detroit",
-        "record": "22-6"
+        "record": "23-6"
       }
     },
     {
-      "game_id": "0022500407",
+      "game_id": "0022500420",
       "status": 2,
-      "status_text": "Q4 4:47",
+      "status_text": "Q4 :38.9",
       "period": 4,
-      "clock": "PT04M47.00S",
-      "start_time_utc": "2025-12-23T03:00:00Z",
+      "clock": "PT00M38.90S",
+      "start_time_utc": "2025-12-24T03:00:00Z",
       "home": {
-        "teamId": 1610612744,
-        "teamTricode": "GSW",
-        "teamName": "Warriors",
-        "teamCity": "Golden State",
-        "wins": 14,
-        "losses": 15,
-        "score": 109,
+        "teamId": 1610612757,
+        "teamTricode": "POR",
+        "teamName": "Trail Blazers",
+        "teamCity": "Portland",
+        "wins": 12,
+        "losses": 17,
+        "score": 105,
         "seed": null,
         "inBonus": "0",
         "timeoutsRemaining": 2,
@@ -107,28 +107,28 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 26
+            "score": 21
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 29
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 31
+            "score": 30
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 20
+            "score": 25
           }
         ],
-        "tricode": "GSW",
-        "name": "Warriors",
-        "city": "Golden State",
-        "record": "14-15"
+        "tricode": "POR",
+        "name": "Trail Blazers",
+        "city": "Portland",
+        "record": "12-17"
       },
       "away": {
         "teamId": 1610612753,
@@ -136,21 +136,21 @@
         "teamName": "Magic",
         "teamCity": "Orlando",
         "wins": 16,
-        "losses": 12,
-        "score": 92,
+        "losses": 13,
+        "score": 107,
         "seed": null,
         "inBonus": "0",
-        "timeoutsRemaining": 3,
+        "timeoutsRemaining": 2,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 30
+            "score": 25
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 27
+            "score": 38
           },
           {
             "period": 3,
@@ -160,18 +160,102 @@
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 9
+            "score": 18
           }
         ],
         "tricode": "ORL",
         "name": "Magic",
         "city": "Orlando",
-        "record": "16-12"
+        "record": "16-13"
+      }
+    },
+    {
+      "game_id": "0022500422",
+      "status": 2,
+      "status_text": "Q3 2:58",
+      "period": 3,
+      "clock": "PT02M58.00S",
+      "start_time_utc": "2025-12-24T03:30:00Z",
+      "home": {
+        "teamId": 1610612746,
+        "teamTricode": "LAC",
+        "teamName": "Clippers",
+        "teamCity": "LA",
+        "wins": 7,
+        "losses": 21,
+        "score": 92,
+        "seed": null,
+        "inBonus": "1",
+        "timeoutsRemaining": 5,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 29
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 34
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 29
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 0
+          }
+        ],
+        "tricode": "LAC",
+        "name": "Clippers",
+        "city": "LA",
+        "record": "7-21"
+      },
+      "away": {
+        "teamId": 1610612745,
+        "teamTricode": "HOU",
+        "teamName": "Rockets",
+        "teamCity": "Houston",
+        "wins": 17,
+        "losses": 9,
+        "score": 75,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 35
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 23
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 17
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 0
+          }
+        ],
+        "tricode": "HOU",
+        "name": "Rockets",
+        "city": "Houston",
+        "record": "17-9"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2025-12-23T05:17:33.563184+00:00"
+  "generated_at_utc": "2025-12-24T05:17:51.737962+00:00"
 }
