@@ -2,33 +2,33 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022500013",
+      "game_id": "0022500431",
       "status": 2,
-      "status_text": "Q3 7:06",
-      "period": 3,
-      "clock": "PT07M06.00S",
-      "start_time_utc": "2025-12-26T03:30:00Z",
+      "status_text": "Q4 8:12",
+      "period": 4,
+      "clock": "PT08M12.00S",
+      "start_time_utc": "2025-12-27T03:00:00Z",
       "home": {
-        "teamId": 1610612743,
-        "teamTricode": "DEN",
-        "teamName": "Nuggets",
-        "teamCity": "Denver",
-        "wins": 21,
-        "losses": 8,
-        "score": 73,
+        "teamId": 1610612757,
+        "teamTricode": "POR",
+        "teamName": "Trail Blazers",
+        "teamCity": "Portland",
+        "wins": 12,
+        "losses": 18,
+        "score": 88,
         "seed": null,
         "inBonus": "0",
-        "timeoutsRemaining": 4,
+        "timeoutsRemaining": 2,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 35
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 27
           },
           {
             "period": 3,
@@ -38,56 +38,56 @@
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 0
+            "score": 10
           }
         ],
-        "tricode": "DEN",
-        "name": "Nuggets",
-        "city": "Denver",
-        "record": "21-8"
+        "tricode": "POR",
+        "name": "Trail Blazers",
+        "city": "Portland",
+        "record": "12-18"
       },
       "away": {
-        "teamId": 1610612750,
-        "teamTricode": "MIN",
-        "teamName": "Timberwolves",
-        "teamCity": "Minnesota",
-        "wins": 20,
-        "losses": 10,
-        "score": 61,
+        "teamId": 1610612746,
+        "teamTricode": "LAC",
+        "teamName": "Clippers",
+        "teamCity": "LA",
+        "wins": 8,
+        "losses": 21,
+        "score": 101,
         "seed": null,
         "inBonus": "0",
-        "timeoutsRemaining": 4,
+        "timeoutsRemaining": 3,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 29
+            "score": 25
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 26
+            "score": 31
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 6
+            "score": 29
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 0
+            "score": 16
           }
         ],
-        "tricode": "MIN",
-        "name": "Timberwolves",
-        "city": "Minnesota",
-        "record": "20-10"
+        "tricode": "LAC",
+        "name": "Clippers",
+        "city": "LA",
+        "record": "8-21"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2025-12-26T05:15:41.063460+00:00"
+  "generated_at_utc": "2025-12-27T05:14:21.213815+00:00"
 }
