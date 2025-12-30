@@ -1,8 +1,93 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "0022500457",
+      "status": 2,
+      "status_text": "Q3 6:58",
+      "period": 3,
+      "clock": "PT06M58.00S",
+      "start_time_utc": "2025-12-30T03:30:00Z",
+      "home": {
+        "teamId": 1610612757,
+        "teamTricode": "POR",
+        "teamName": "Trail Blazers",
+        "teamCity": "Portland",
+        "wins": 13,
+        "losses": 19,
+        "score": 84,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 4,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 42
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 33
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 9
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 0
+          }
+        ],
+        "tricode": "POR",
+        "name": "Trail Blazers",
+        "city": "Portland",
+        "record": "13-19"
+      },
+      "away": {
+        "teamId": 1610612742,
+        "teamTricode": "DAL",
+        "teamName": "Mavericks",
+        "teamCity": "Dallas",
+        "wins": 12,
+        "losses": 21,
+        "score": 73,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 4,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 29
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 34
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 10
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 0
+          }
+        ],
+        "tricode": "DAL",
+        "name": "Mavericks",
+        "city": "Dallas",
+        "record": "12-21"
+      }
+    }
+  ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2025-12-28T05:17:47.360157+00:00"
+  "generated_at_utc": "2025-12-30T05:17:40.239555+00:00"
 }
