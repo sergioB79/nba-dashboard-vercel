@@ -2,28 +2,28 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022500475",
+      "game_id": "0022500484",
       "status": 2,
-      "status_text": "Q3 3:03",
-      "period": 3,
-      "clock": "PT03M03.00S",
-      "start_time_utc": "2026-01-02T03:30:00Z",
+      "status_text": "Q4 6:37",
+      "period": 4,
+      "clock": "PT06M37.00S",
+      "start_time_utc": "2026-01-03T03:00:00Z",
       "home": {
-        "teamId": 1610612746,
-        "teamTricode": "LAC",
-        "teamName": "Clippers",
-        "teamCity": "LA",
-        "wins": 11,
-        "losses": 21,
-        "score": 71,
+        "teamId": 1610612744,
+        "teamTricode": "GSW",
+        "teamName": "Warriors",
+        "teamCity": "Golden State",
+        "wins": 18,
+        "losses": 16,
+        "score": 76,
         "seed": null,
-        "inBonus": "1",
-        "timeoutsRemaining": 5,
+        "inBonus": "0",
+        "timeoutsRemaining": 1,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 31
+            "score": 23
           },
           {
             "period": 2,
@@ -33,7 +33,91 @@
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 18
+            "score": 21
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 10
+          }
+        ],
+        "tricode": "GSW",
+        "name": "Warriors",
+        "city": "Golden State",
+        "record": "18-16"
+      },
+      "away": {
+        "teamId": 1610612760,
+        "teamTricode": "OKC",
+        "teamName": "Thunder",
+        "teamCity": "Oklahoma City",
+        "wins": 29,
+        "losses": 5,
+        "score": 110,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 4,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 34
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 30
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 31
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 15
+          }
+        ],
+        "tricode": "OKC",
+        "name": "Thunder",
+        "city": "Oklahoma City",
+        "record": "29-5"
+      }
+    },
+    {
+      "game_id": "0022500485",
+      "status": 2,
+      "status_text": "Q3 5:23",
+      "period": 3,
+      "clock": "PT05M23.00S",
+      "start_time_utc": "2026-01-03T03:30:00Z",
+      "home": {
+        "teamId": 1610612747,
+        "teamTricode": "LAL",
+        "teamName": "Lakers",
+        "teamCity": "Los Angeles",
+        "wins": 20,
+        "losses": 11,
+        "score": 78,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 39
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 27
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 12
           },
           {
             "period": 4,
@@ -41,19 +125,19 @@
             "score": 0
           }
         ],
-        "tricode": "LAC",
-        "name": "Clippers",
-        "city": "LA",
-        "record": "11-21"
+        "tricode": "LAL",
+        "name": "Lakers",
+        "city": "Los Angeles",
+        "record": "20-11"
       },
       "away": {
-        "teamId": 1610612762,
-        "teamTricode": "UTA",
-        "teamName": "Jazz",
-        "teamCity": "Utah",
-        "wins": 12,
-        "losses": 20,
-        "score": 75,
+        "teamId": 1610612763,
+        "teamTricode": "MEM",
+        "teamName": "Grizzlies",
+        "teamCity": "Memphis",
+        "wins": 15,
+        "losses": 18,
+        "score": 76,
         "seed": null,
         "inBonus": "1",
         "timeoutsRemaining": 4,
@@ -61,17 +145,17 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 17
+            "score": 31
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 33
+            "score": 29
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 16
           },
           {
             "period": 4,
@@ -79,15 +163,15 @@
             "score": 0
           }
         ],
-        "tricode": "UTA",
-        "name": "Jazz",
-        "city": "Utah",
-        "record": "12-20"
+        "tricode": "MEM",
+        "name": "Grizzlies",
+        "city": "Memphis",
+        "record": "15-18"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-01-02T05:19:02.472002+00:00"
+  "generated_at_utc": "2026-01-03T05:14:51.547172+00:00"
 }
