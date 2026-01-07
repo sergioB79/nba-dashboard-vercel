@@ -2,92 +2,92 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022500508",
+      "game_id": "0022500515",
       "status": 2,
-      "status_text": "Q4 3:39",
-      "period": 4,
-      "clock": "PT03M39.00S",
-      "start_time_utc": "2026-01-06T03:00:00Z",
+      "status_text": "Half",
+      "period": 2,
+      "clock": "PT00M00.00S",
+      "start_time_utc": "2026-01-07T04:00:00Z",
       "home": {
-        "teamId": 1610612746,
-        "teamTricode": "LAC",
-        "teamName": "Clippers",
-        "teamCity": "LA",
-        "wins": 12,
-        "losses": 22,
-        "score": 94,
+        "teamId": 1610612758,
+        "teamTricode": "SAC",
+        "teamName": "Kings",
+        "teamCity": "Sacramento",
+        "wins": 8,
+        "losses": 28,
+        "score": 58,
         "seed": null,
-        "inBonus": "1",
-        "timeoutsRemaining": 2,
+        "inBonus": "0",
+        "timeoutsRemaining": 4,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 31
+            "score": 35
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 24
+            "score": 23
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 21
+            "score": 0
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 18
+            "score": 0
           }
         ],
-        "tricode": "LAC",
-        "name": "Clippers",
-        "city": "LA",
-        "record": "12-22"
+        "tricode": "SAC",
+        "name": "Kings",
+        "city": "Sacramento",
+        "record": "8-28"
       },
       "away": {
-        "teamId": 1610612744,
-        "teamTricode": "GSW",
-        "teamName": "Warriors",
-        "teamCity": "Golden State",
-        "wins": 19,
-        "losses": 17,
-        "score": 85,
+        "teamId": 1610612742,
+        "teamTricode": "DAL",
+        "teamName": "Mavericks",
+        "teamCity": "Dallas",
+        "wins": 13,
+        "losses": 23,
+        "score": 46,
         "seed": null,
-        "inBonus": "1",
-        "timeoutsRemaining": 2,
+        "inBonus": "0",
+        "timeoutsRemaining": 4,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 19
+            "score": 25
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 21
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 13
+            "score": 0
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 21
+            "score": 0
           }
         ],
-        "tricode": "GSW",
-        "name": "Warriors",
-        "city": "Golden State",
-        "record": "19-17"
+        "tricode": "DAL",
+        "name": "Mavericks",
+        "city": "Dallas",
+        "record": "13-23"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-01-06T05:18:34.382703+00:00"
+  "generated_at_utc": "2026-01-07T05:18:56.405045+00:00"
 }
