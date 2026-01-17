@@ -2,20 +2,20 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022500576",
+      "game_id": "0022500591",
       "status": 2,
-      "status_text": "Q4 7:16",
+      "status_text": "Q4 3:16",
       "period": 4,
-      "clock": "PT07M16.00S",
-      "start_time_utc": "2026-01-15T03:00:00Z",
+      "clock": "PT03M16.00S",
+      "start_time_utc": "2026-01-17T02:30:00Z",
       "home": {
-        "teamId": 1610612758,
-        "teamTricode": "SAC",
-        "teamName": "Kings",
-        "teamCity": "Sacramento",
-        "wins": 10,
-        "losses": 30,
-        "score": 100,
+        "teamId": 1610612745,
+        "teamTricode": "HOU",
+        "teamName": "Rockets",
+        "teamCity": "Houston",
+        "wins": 23,
+        "losses": 15,
+        "score": 103,
         "seed": null,
         "inBonus": "0",
         "timeoutsRemaining": 2,
@@ -23,7 +23,7 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 29
           },
           {
             "period": 2,
@@ -33,40 +33,86 @@
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 40
+            "score": 28
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 4
+            "score": 22
           }
         ],
-        "tricode": "SAC",
-        "name": "Kings",
-        "city": "Sacramento",
-        "record": "10-30"
+        "tricode": "HOU",
+        "name": "Rockets",
+        "city": "Houston",
+        "record": "23-15"
       },
       "away": {
-        "teamId": 1610612752,
-        "teamTricode": "NYK",
-        "teamName": "Knicks",
-        "teamCity": "New York",
-        "wins": 25,
+        "teamId": 1610612750,
+        "teamTricode": "MIN",
+        "teamName": "Timberwolves",
+        "teamCity": "Minnesota",
+        "wins": 27,
         "losses": 14,
-        "score": 85,
+        "score": 98,
         "seed": null,
-        "inBonus": "0",
-        "timeoutsRemaining": 3,
+        "inBonus": "1",
+        "timeoutsRemaining": 2,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 17
+            "score": 34
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 21
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 27
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 16
+          }
+        ],
+        "tricode": "MIN",
+        "name": "Timberwolves",
+        "city": "Minnesota",
+        "record": "27-14"
+      }
+    },
+    {
+      "game_id": "0022500592",
+      "status": 2,
+      "status_text": "Q4 6:47",
+      "period": 4,
+      "clock": "PT06M47.00S",
+      "start_time_utc": "2026-01-17T03:00:00Z",
+      "home": {
+        "teamId": 1610612758,
+        "teamTricode": "SAC",
+        "teamName": "Kings",
+        "teamCity": "Sacramento",
+        "wins": 11,
+        "losses": 30,
+        "score": 115,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 2,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 41
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 26
           },
           {
             "period": 3,
@@ -76,59 +122,13 @@
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 9
+            "score": 14
           }
         ],
-        "tricode": "NYK",
-        "name": "Knicks",
-        "city": "New York",
-        "record": "25-14"
-      }
-    },
-    {
-      "game_id": "0022500577",
-      "status": 2,
-      "status_text": "Q3 2:56",
-      "period": 3,
-      "clock": "PT02M56.00S",
-      "start_time_utc": "2026-01-15T03:30:00Z",
-      "home": {
-        "teamId": 1610612746,
-        "teamTricode": "LAC",
-        "teamName": "Clippers",
-        "teamCity": "LA",
-        "wins": 16,
-        "losses": 23,
-        "score": 85,
-        "seed": null,
-        "inBonus": "1",
-        "timeoutsRemaining": 2,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 37
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 33
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 15
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 0
-          }
-        ],
-        "tricode": "LAC",
-        "name": "Clippers",
-        "city": "LA",
-        "record": "16-23"
+        "tricode": "SAC",
+        "name": "Kings",
+        "city": "Sacramento",
+        "record": "11-30"
       },
       "away": {
         "teamId": 1610612764,
@@ -136,11 +136,11 @@
         "teamName": "Wizards",
         "teamCity": "Washington",
         "wins": 10,
-        "losses": 28,
-        "score": 83,
+        "losses": 29,
+        "score": 101,
         "seed": null,
         "inBonus": "0",
-        "timeoutsRemaining": 4,
+        "timeoutsRemaining": 3,
         "periods": [
           {
             "period": 1,
@@ -150,28 +150,28 @@
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 29
+            "score": 39
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 23
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 0
+            "score": 17
           }
         ],
         "tricode": "WAS",
         "name": "Wizards",
         "city": "Washington",
-        "record": "10-28"
+        "record": "10-29"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-01-15T05:19:34.385317+00:00"
+  "generated_at_utc": "2026-01-17T05:13:56.810835+00:00"
 }
