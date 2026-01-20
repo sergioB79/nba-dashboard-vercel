@@ -1,8 +1,93 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "0022500612",
+      "status": 2,
+      "status_text": "Q4 2:06",
+      "period": 4,
+      "clock": "PT02M06.00S",
+      "start_time_utc": "2026-01-20T03:00:00Z",
+      "home": {
+        "teamId": 1610612744,
+        "teamTricode": "GSW",
+        "teamName": "Warriors",
+        "teamCity": "Golden State",
+        "wins": 24,
+        "losses": 19,
+        "score": 129,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 2,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 36
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 34
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 34
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 25
+          }
+        ],
+        "tricode": "GSW",
+        "name": "Warriors",
+        "city": "Golden State",
+        "record": "24-19"
+      },
+      "away": {
+        "teamId": 1610612748,
+        "teamTricode": "MIA",
+        "teamName": "Heat",
+        "teamCity": "Miami",
+        "wins": 22,
+        "losses": 20,
+        "score": 110,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 1,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 34
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 32
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 27
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 17
+          }
+        ],
+        "tricode": "MIA",
+        "name": "Heat",
+        "city": "Miami",
+        "record": "22-20"
+      }
+    }
+  ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-01-19T05:25:44.139686+00:00"
+  "generated_at_utc": "2026-01-20T05:22:45.452649+00:00"
 }
