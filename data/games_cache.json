@@ -2,122 +2,38 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022500618",
+      "game_id": "0022500626",
       "status": 2,
-      "status_text": "Q4 3:51",
+      "status_text": "Q4 2:39",
       "period": 4,
-      "clock": "PT03M51.00S",
-      "start_time_utc": "2026-01-21T03:00:00Z",
-      "home": {
-        "teamId": 1610612744,
-        "teamTricode": "GSW",
-        "teamName": "Warriors",
-        "teamCity": "Golden State",
-        "wins": 25,
-        "losses": 19,
-        "score": 116,
-        "seed": null,
-        "inBonus": "0",
-        "timeoutsRemaining": 2,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 22
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 44
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 22
-          }
-        ],
-        "tricode": "GSW",
-        "name": "Warriors",
-        "city": "Golden State",
-        "record": "25-19"
-      },
-      "away": {
-        "teamId": 1610612761,
-        "teamTricode": "TOR",
-        "teamName": "Raptors",
-        "teamCity": "Toronto",
-        "wins": 25,
-        "losses": 19,
-        "score": 131,
-        "seed": null,
-        "inBonus": "0",
-        "timeoutsRemaining": 2,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 41
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 29
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 38
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 23
-          }
-        ],
-        "tricode": "TOR",
-        "name": "Raptors",
-        "city": "Toronto",
-        "record": "25-19"
-      }
-    },
-    {
-      "game_id": "0022500619",
-      "status": 2,
-      "status_text": "Q4 1:24",
-      "period": 4,
-      "clock": "PT01M24.00S",
-      "start_time_utc": "2026-01-21T03:00:00Z",
+      "clock": "PT02M39.00S",
+      "start_time_utc": "2026-01-22T03:00:00Z",
       "home": {
         "teamId": 1610612758,
         "teamTricode": "SAC",
         "teamName": "Kings",
         "teamCity": "Sacramento",
         "wins": 12,
-        "losses": 31,
-        "score": 112,
+        "losses": 32,
+        "score": 105,
         "seed": null,
-        "inBonus": "0",
-        "timeoutsRemaining": 1,
+        "inBonus": "1",
+        "timeoutsRemaining": 2,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 30
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 39
+            "score": 31
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 21
           },
           {
             "period": 4,
@@ -128,134 +44,50 @@
         "tricode": "SAC",
         "name": "Kings",
         "city": "Sacramento",
-        "record": "12-31"
+        "record": "12-32"
       },
       "away": {
-        "teamId": 1610612748,
-        "teamTricode": "MIA",
-        "teamName": "Heat",
-        "teamCity": "Miami",
-        "wins": 22,
-        "losses": 21,
-        "score": 124,
+        "teamId": 1610612761,
+        "teamTricode": "TOR",
+        "teamName": "Raptors",
+        "teamCity": "Toronto",
+        "wins": 26,
+        "losses": 19,
+        "score": 115,
         "seed": null,
         "inBonus": "0",
-        "timeoutsRemaining": 2,
+        "timeoutsRemaining": 1,
         "periods": [
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 26
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 45
+            "score": 26
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 23
+            "score": 43
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 24
+            "score": 20
           }
         ],
-        "tricode": "MIA",
-        "name": "Heat",
-        "city": "Miami",
-        "record": "22-21"
-      }
-    },
-    {
-      "game_id": "0022500617",
-      "status": 2,
-      "status_text": "Q4 1:33",
-      "period": 4,
-      "clock": "PT01M33.00S",
-      "start_time_utc": "2026-01-21T03:00:00Z",
-      "home": {
-        "teamId": 1610612743,
-        "teamTricode": "DEN",
-        "teamName": "Nuggets",
-        "teamCity": "Denver",
-        "wins": 29,
-        "losses": 14,
-        "score": 102,
-        "seed": null,
-        "inBonus": "0",
-        "timeoutsRemaining": 2,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 37
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 34
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 17
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 14
-          }
-        ],
-        "tricode": "DEN",
-        "name": "Nuggets",
-        "city": "Denver",
-        "record": "29-14"
-      },
-      "away": {
-        "teamId": 1610612747,
-        "teamTricode": "LAL",
-        "teamName": "Lakers",
-        "teamCity": "Los Angeles",
-        "wins": 25,
-        "losses": 16,
-        "score": 110,
-        "seed": null,
-        "inBonus": "1",
-        "timeoutsRemaining": 2,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 29
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 29
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 24
-          }
-        ],
-        "tricode": "LAL",
-        "name": "Lakers",
-        "city": "Los Angeles",
-        "record": "25-16"
+        "tricode": "TOR",
+        "name": "Raptors",
+        "city": "Toronto",
+        "record": "26-19"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-01-21T05:22:58.892402+00:00"
+  "generated_at_utc": "2026-01-22T05:21:56.892187+00:00"
 }
