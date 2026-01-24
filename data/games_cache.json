@@ -2,58 +2,20 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022500633",
+      "game_id": "0022500642",
       "status": 2,
-      "status_text": "Q4 3:27",
+      "status_text": "Q4 1:23",
       "period": 4,
-      "clock": "PT03M27.00S",
-      "start_time_utc": "2026-01-23T03:00:00Z",
+      "clock": "PT01M23.00S",
+      "start_time_utc": "2026-01-24T03:00:00Z",
       "home": {
-        "teamId": 1610612746,
-        "teamTricode": "LAC",
-        "teamName": "Clippers",
-        "teamCity": "LA",
-        "wins": 19,
-        "losses": 24,
-        "score": 100,
-        "seed": null,
-        "inBonus": "1",
-        "timeoutsRemaining": 3,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 36
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 28
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 22
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 14
-          }
-        ],
-        "tricode": "LAC",
-        "name": "Clippers",
-        "city": "LA",
-        "record": "19-24"
-      },
-      "away": {
-        "teamId": 1610612747,
-        "teamTricode": "LAL",
-        "teamName": "Lakers",
-        "teamCity": "Los Angeles",
-        "wins": 26,
-        "losses": 16,
-        "score": 91,
+        "teamId": 1610612757,
+        "teamTricode": "POR",
+        "teamName": "Trail Blazers",
+        "teamCity": "Portland",
+        "wins": 23,
+        "losses": 22,
+        "score": 96,
         "seed": null,
         "inBonus": "0",
         "timeoutsRemaining": 2,
@@ -61,33 +23,71 @@
           {
             "period": 1,
             "periodType": "REGULAR",
-            "score": 29
+            "score": 12
           },
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 18
+            "score": 31
           },
           {
             "period": 3,
             "periodType": "REGULAR",
-            "score": 25
+            "score": 31
           },
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 19
+            "score": 22
           }
         ],
-        "tricode": "LAL",
-        "name": "Lakers",
-        "city": "Los Angeles",
-        "record": "26-16"
+        "tricode": "POR",
+        "name": "Trail Blazers",
+        "city": "Portland",
+        "record": "23-22"
+      },
+      "away": {
+        "teamId": 1610612761,
+        "teamTricode": "TOR",
+        "teamName": "Raptors",
+        "teamCity": "Toronto",
+        "wins": 27,
+        "losses": 19,
+        "score": 106,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 2,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 19
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 31
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 26
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 30
+          }
+        ],
+        "tricode": "TOR",
+        "name": "Raptors",
+        "city": "Toronto",
+        "record": "27-19"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-01-23T05:21:21.526990+00:00"
+  "generated_at_utc": "2026-01-24T05:15:23.771667+00:00"
 }
