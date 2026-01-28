@@ -1,8 +1,93 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "0022500670",
+      "status": 2,
+      "status_text": "Q4 4:18",
+      "period": 4,
+      "clock": "PT04M18.00S",
+      "start_time_utc": "2026-01-28T03:00:00Z",
+      "home": {
+        "teamId": 1610612762,
+        "teamTricode": "UTA",
+        "teamName": "Jazz",
+        "teamCity": "Utah",
+        "wins": 15,
+        "losses": 31,
+        "score": 85,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 2,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 29
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 25
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 20
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 11
+          }
+        ],
+        "tricode": "UTA",
+        "name": "Jazz",
+        "city": "Utah",
+        "record": "15-31"
+      },
+      "away": {
+        "teamId": 1610612746,
+        "teamTricode": "LAC",
+        "teamName": "Clippers",
+        "teamCity": "LA",
+        "wins": 21,
+        "losses": 24,
+        "score": 104,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 18
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 35
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 36
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 15
+          }
+        ],
+        "tricode": "LAC",
+        "name": "Clippers",
+        "city": "LA",
+        "record": "21-24"
+      }
+    }
+  ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-01-27T05:20:52.191094+00:00"
+  "generated_at_utc": "2026-01-28T05:21:52.510397+00:00"
 }
