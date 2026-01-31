@@ -1,8 +1,93 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "0022500696",
+      "status": 2,
+      "status_text": "Q4 4:29",
+      "period": 4,
+      "clock": "PT04M29.00S",
+      "start_time_utc": "2026-01-31T03:00:00Z",
+      "home": {
+        "teamId": 1610612744,
+        "teamTricode": "GSW",
+        "teamName": "Warriors",
+        "teamCity": "Golden State",
+        "wins": 27,
+        "losses": 22,
+        "score": 114,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 37
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 27
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 31
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 19
+          }
+        ],
+        "tricode": "GSW",
+        "name": "Warriors",
+        "city": "Golden State",
+        "record": "27-22"
+      },
+      "away": {
+        "teamId": 1610612765,
+        "teamTricode": "DET",
+        "teamName": "Pistons",
+        "teamCity": "Detroit",
+        "wins": 34,
+        "losses": 12,
+        "score": 120,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 45
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 32
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 31
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 12
+          }
+        ],
+        "tricode": "DET",
+        "name": "Pistons",
+        "city": "Detroit",
+        "record": "34-12"
+      }
+    }
+  ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-01-30T05:40:19.007191+00:00"
+  "generated_at_utc": "2026-01-31T05:32:53.442156+00:00"
 }
