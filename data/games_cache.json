@@ -1,8 +1,93 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "0022500725",
+      "status": 2,
+      "status_text": "Q3 6:04",
+      "period": 3,
+      "clock": "PT06M04.00S",
+      "start_time_utc": "2026-02-04T04:00:00Z",
+      "home": {
+        "teamId": 1610612757,
+        "teamTricode": "POR",
+        "teamName": "Trail Blazers",
+        "teamCity": "Portland",
+        "wins": 23,
+        "losses": 27,
+        "score": 82,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 4,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 41
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 31
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 10
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 0
+          }
+        ],
+        "tricode": "POR",
+        "name": "Trail Blazers",
+        "city": "Portland",
+        "record": "23-27"
+      },
+      "away": {
+        "teamId": 1610612756,
+        "teamTricode": "PHX",
+        "teamName": "Suns",
+        "teamCity": "Phoenix",
+        "wins": 30,
+        "losses": 20,
+        "score": 84,
+        "seed": null,
+        "inBonus": "0",
+        "timeoutsRemaining": 4,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 30
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 37
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 17
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 0
+          }
+        ],
+        "tricode": "PHX",
+        "name": "Suns",
+        "city": "Phoenix",
+        "record": "30-20"
+      }
+    }
+  ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-02-03T05:43:54.004304+00:00"
+  "generated_at_utc": "2026-02-04T05:41:43.146919+00:00"
 }
