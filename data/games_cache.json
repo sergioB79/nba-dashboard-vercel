@@ -1,8 +1,93 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "0022500740",
+      "status": 2,
+      "status_text": "4th Qtr             ",
+      "period": 4,
+      "clock": "PT00M004.00S",
+      "start_time_utc": "2026-02-06T03:00:00Z",
+      "home": {
+        "teamId": 1610612747,
+        "teamTricode": "LAL",
+        "teamName": "Lakers",
+        "teamCity": "Los Angeles",
+        "wins": 30,
+        "losses": 19,
+        "score": 119,
+        "seed": null,
+        "inBonus": null,
+        "timeoutsRemaining": 0,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 21
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 30
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 34
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 34
+          }
+        ],
+        "tricode": "LAL",
+        "name": "Lakers",
+        "city": "Los Angeles",
+        "record": "30-19"
+      },
+      "away": {
+        "teamId": 1610612755,
+        "teamTricode": "PHI",
+        "teamName": "76ers",
+        "teamCity": "Philadelphia",
+        "wins": 29,
+        "losses": 21,
+        "score": 115,
+        "seed": null,
+        "inBonus": null,
+        "timeoutsRemaining": 0,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 27
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 32
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 28
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 28
+          }
+        ],
+        "tricode": "PHI",
+        "name": "76ers",
+        "city": "Philadelphia",
+        "record": "29-21"
+      }
+    }
+  ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-02-05T05:48:37.417589+00:00"
+  "generated_at_utc": "2026-02-06T05:46:17.385778+00:00"
 }
