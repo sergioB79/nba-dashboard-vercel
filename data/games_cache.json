@@ -2,60 +2,22 @@
   "ok": true,
   "live_games": [
     {
-      "game_id": "0022500740",
+      "game_id": "0022500746",
       "status": 2,
-      "status_text": "4th Qtr             ",
+      "status_text": "Q4 :16.3",
       "period": 4,
-      "clock": "PT00M004.00S",
-      "start_time_utc": "2026-02-06T03:00:00Z",
+      "clock": "PT00M16.30S",
+      "start_time_utc": "2026-02-07T03:00:00Z",
       "home": {
-        "teamId": 1610612747,
-        "teamTricode": "LAL",
-        "teamName": "Lakers",
-        "teamCity": "Los Angeles",
-        "wins": 30,
-        "losses": 19,
-        "score": 119,
+        "teamId": 1610612758,
+        "teamTricode": "SAC",
+        "teamName": "Kings",
+        "teamCity": "Sacramento",
+        "wins": 12,
+        "losses": 40,
+        "score": 107,
         "seed": null,
-        "inBonus": null,
-        "timeoutsRemaining": 0,
-        "periods": [
-          {
-            "period": 1,
-            "periodType": "REGULAR",
-            "score": 21
-          },
-          {
-            "period": 2,
-            "periodType": "REGULAR",
-            "score": 30
-          },
-          {
-            "period": 3,
-            "periodType": "REGULAR",
-            "score": 34
-          },
-          {
-            "period": 4,
-            "periodType": "REGULAR",
-            "score": 34
-          }
-        ],
-        "tricode": "LAL",
-        "name": "Lakers",
-        "city": "Los Angeles",
-        "record": "30-19"
-      },
-      "away": {
-        "teamId": 1610612755,
-        "teamTricode": "PHI",
-        "teamName": "76ers",
-        "teamCity": "Philadelphia",
-        "wins": 29,
-        "losses": 21,
-        "score": 115,
-        "seed": null,
-        "inBonus": null,
+        "inBonus": "1",
         "timeoutsRemaining": 0,
         "periods": [
           {
@@ -66,7 +28,7 @@
           {
             "period": 2,
             "periodType": "REGULAR",
-            "score": 32
+            "score": 22
           },
           {
             "period": 3,
@@ -76,18 +38,56 @@
           {
             "period": 4,
             "periodType": "REGULAR",
-            "score": 28
+            "score": 30
           }
         ],
-        "tricode": "PHI",
-        "name": "76ers",
-        "city": "Philadelphia",
-        "record": "29-21"
+        "tricode": "SAC",
+        "name": "Kings",
+        "city": "Sacramento",
+        "record": "12-40"
+      },
+      "away": {
+        "teamId": 1610612746,
+        "teamTricode": "LAC",
+        "teamName": "Clippers",
+        "teamCity": "LA",
+        "wins": 23,
+        "losses": 27,
+        "score": 112,
+        "seed": null,
+        "inBonus": "1",
+        "timeoutsRemaining": 2,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 17
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 31
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 31
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 33
+          }
+        ],
+        "tricode": "LAC",
+        "name": "Clippers",
+        "city": "LA",
+        "record": "23-27"
       }
     }
   ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-02-06T05:46:17.385778+00:00"
+  "generated_at_utc": "2026-02-07T05:35:02.418675+00:00"
 }
