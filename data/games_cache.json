@@ -1,8 +1,93 @@
 {
   "ok": true,
-  "live_games": [],
+  "live_games": [
+    {
+      "game_id": "0022500801",
+      "status": 2,
+      "status_text": "Q4 4:33",
+      "period": 4,
+      "clock": "PT04M33.00S",
+      "start_time_utc": "2026-02-20T03:30:00Z",
+      "home": {
+        "teamId": 1610612746,
+        "teamTricode": "LAC",
+        "teamName": "Clippers",
+        "teamCity": "LA",
+        "wins": 26,
+        "losses": 28,
+        "score": 96,
+        "seed": null,
+        "inBonus": "1",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 25
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 20
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 33
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 18
+          }
+        ],
+        "tricode": "LAC",
+        "name": "Clippers",
+        "city": "LA",
+        "record": "26-28"
+      },
+      "away": {
+        "teamId": 1610612743,
+        "teamTricode": "DEN",
+        "teamName": "Nuggets",
+        "teamCity": "Denver",
+        "wins": 35,
+        "losses": 20,
+        "score": 98,
+        "seed": null,
+        "inBonus": "1",
+        "timeoutsRemaining": 3,
+        "periods": [
+          {
+            "period": 1,
+            "periodType": "REGULAR",
+            "score": 24
+          },
+          {
+            "period": 2,
+            "periodType": "REGULAR",
+            "score": 28
+          },
+          {
+            "period": 3,
+            "periodType": "REGULAR",
+            "score": 25
+          },
+          {
+            "period": 4,
+            "periodType": "REGULAR",
+            "score": 21
+          }
+        ],
+        "tricode": "DEN",
+        "name": "Nuggets",
+        "city": "Denver",
+        "record": "35-20"
+      }
+    }
+  ],
   "today_upcoming": [],
   "tomorrow_upcoming": [],
   "warnings": [],
-  "generated_at_utc": "2026-02-19T05:53:09.169114+00:00"
+  "generated_at_utc": "2026-02-20T05:46:16.665130+00:00"
 }
