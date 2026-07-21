@@ -6,5 +6,5 @@
   "warnings": [
     "Erro ao obter jogos: 403 Client Error: Forbidden for url: https://cdn.nba.com/static/json/liveData/scoreboard/todaysScoreboard_00.json"
   ],
-  "generated_at_utc": "2026-07-20T07:51:49.257655+00:00"
+  "generated_at_utc": "2026-07-21T07:27:39.652783+00:00"
 }
